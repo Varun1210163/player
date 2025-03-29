@@ -572,4 +572,81 @@
         const dropHTML = e.dataTransfer.getData("text/html");
         this.insertAdjacentHTML("beforebegin", dropHTML);
         const droppedElem = this.previousSibling;
-        addDnDHandlers(d
+        addDnDHandlers(droppedElem);
+        playlist = Array.from(playlistEl.querySelectorAll("li"));
+      }
+      this.classList.remove("drag-over");
+      return false;
+    }
+    function handleDragEnd(e) {
+      this.classList.remove("dragging");
+      playlist.forEach(item => item.classList.remove("drag-over"));
+    }
+    function addDnDHandlers(elem) {
+      elem.addEventListener("dragstart", handleDragStart, false);
+      elem.addEventListener("dragover", handleDragOver, false);
+      elem.addEventListener("dragleave", handleDragLeave, false);
+      elem.addEventListener("drop", handleDrop, false);
+      elem.addEventListener("dragend", handleDragEnd, false);
+    }
+    playlist.forEach(item => {
+      addDnDHandlers(item);
+      item.addEventListener("click", () => {
+        const idx = playlist.indexOf(item);
+        playMedia(idx);
+      });
+    });
+    // Search filtering
+    playlistSearch.addEventListener("input", () => {
+      const query = playlistSearch.value.toLowerCase();
+      playlist.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? "flex" : "none";
+      });
+    });
+
+    /* ===== Keyboard Shortcuts ===== */
+    document.addEventListener("keydown", (e) => {
+      switch(e.key) {
+        case " ":
+          e.preventDefault();
+          if (mediaPlayer.paused) playBtn.click();
+          else pauseBtn.click();
+          break;
+        case "ArrowRight":
+          nextBtn.click();
+          break;
+        case "ArrowLeft":
+          prevBtn.click();
+          break;
+        case "ArrowUp":
+          volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+        case "ArrowDown":
+          volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+      }
+    });
+
+    /* ===== Simulated Crossfade on Pause (Simple Fade-Out) ===== */
+    mediaPlayer.addEventListener("pause", () => {
+      let vol = mediaPlayer.volume;
+      const fade = setInterval(() => {
+        if (vol > 0.1) {
+          vol -= 0.1;
+          mediaPlayer.volume = vol;
+        } else {
+          clearInterval(fade);
+        }
+      }, 50);
+    });
+
+    /* ===== Resume AudioContext on Interaction ===== */
+    document.body.addEventListener("click", () => {
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    });
+  </script>
+</body>
+</html>
