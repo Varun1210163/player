@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultra Advanced Vibrant Media Player</title>
-  <meta name="description" content="A vibrant, ultra-advanced multimedia player with advanced controls, dynamic visualizer, and enhanced playlist features.">
+  <meta name="description" content="A vibrant, ultra-advanced multimedia player with advanced controls, a dynamic visualizer, and a built-in song search.">
   <meta name="author" content="Varun Prasath">
   <!-- Embedded CSS -->
   <style>
@@ -29,7 +29,6 @@
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      /* Default animated background */
       background: linear-gradient(135deg, #FF2D95, #2DFEFF, #FFDA2D);
       background-size: 200% 200%;
       animation: bgAnimation 10s ease infinite;
@@ -172,45 +171,37 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Playlist Search/Filter */
-    .playlist-search {
-      margin-bottom: 1rem;
+    /* Search Functionality */
+    .search-container {
       text-align: center;
+      margin-bottom: 1rem;
     }
-    .playlist-search input[type="text"] {
+    .search-container input[type="text"] {
       padding: 0.5rem;
       width: 80%;
       max-width: 300px;
       border: none;
       border-radius: var(--border-radius);
     }
-    /* Playlist */
-    .playlist {
+    /* Search Results */
+    .search-results {
       list-style: none;
       max-height: 200px;
       overflow-y: auto;
-      margin: 1rem 0;
+      margin: 0 auto 1rem;
       padding: 0.5rem;
       background: rgba(255,255,255,0.05);
       border-radius: var(--border-radius);
+      width: 90%;
+      max-width: 500px;
     }
-    .playlist li {
+    .search-results li {
       padding: 0.5rem;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
-    .playlist li.active {
-      background: rgba(255,255,255,0.1);
-    }
-    .playlist li:last-child {
+    .search-results li:last-child {
       border-bottom: none;
-    }
-    /* Drag-and-Drop Highlight */
-    .drag-over {
-      border: 2px dashed var(--accent-color);
     }
   </style>
 </head>
@@ -253,17 +244,12 @@
         <button id="mute">Mute</button>
       </div>
     </div>
-    <!-- Playlist Search/Filter -->
-    <div class="playlist-search">
-      <input type="text" id="playlistSearch" placeholder="Search Playlist...">
+    <!-- Song Search -->
+    <div class="search-container">
+      <input type="text" id="songSearch" placeholder="Search Songs...">
     </div>
-    <!-- Playlist -->
-    <ul class="playlist" id="playlist">
-      <!-- Correct media URLs inserted -->
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio">Audio Track 1 <span>➕</span></li>
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio">Audio Track 2 <span>➕</span></li>
-      <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video">Video Track 1 <span>➕</span></li>
-    </ul>
+    <!-- Search Results -->
+    <ul class="search-results" id="searchResults"></ul>
   </div>
 
   <!-- Embedded JavaScript -->
@@ -289,21 +275,28 @@
     const albumArt = document.getElementById("album-art");
     const visualizer = document.getElementById("visualizer");
     const ctx = visualizer.getContext("2d");
-    const playlistEl = document.getElementById("playlist");
-    const playlistSearch = document.getElementById("playlistSearch");
+    const songSearchInput = document.getElementById("songSearch");
+    const searchResultsEl = document.getElementById("searchResults");
 
     /* ===== Player State ===== */
-    let playlist = Array.from(playlistEl.querySelectorAll("li"));
     let currentIndex = 0;
     let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
     let isShuffle = false;
     let muted = false;
 
+    /* ===== Predefined Songs List ===== */
+    const songs = [
+      { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", type: "audio" },
+      { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song2.mp3", type: "audio" },
+      { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" }
+      // Add more songs as needed.
+    ];
+
     /* ===== Auto-Save & Load Last Position ===== */
     window.addEventListener("load", () => {
       const savedIndex = localStorage.getItem("lastIndex");
       const savedTime = localStorage.getItem("lastTime");
-      if (savedIndex !== null) {
+      if (savedIndex !== null && songs[savedIndex]) {
         currentIndex = parseInt(savedIndex);
       }
       playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
@@ -316,7 +309,7 @@
     /* ===== Web Audio API Setup (Visualizer & Equalizer) ===== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const sourceNode = audioCtx.createMediaElementSource(mediaPlayer);
-    // Create equalizer filters: bass, mid, treble
+    // Basic equalizer filters (unchanged)
     const bassFilter = audioCtx.createBiquadFilter();
     bassFilter.type = "lowshelf";
     bassFilter.frequency.value = 200;
@@ -326,12 +319,11 @@
     const trebleFilter = audioCtx.createBiquadFilter();
     trebleFilter.type = "highshelf";
     trebleFilter.frequency.value = 3000;
-    // Analyser for visualizer
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    // Connect nodes: source -> bass -> mid -> treble -> analyser -> destination
+    // Connect nodes: source -> equalizer filters -> analyser -> destination
     sourceNode.connect(bassFilter);
     bassFilter.connect(midFilter);
     midFilter.connect(trebleFilter);
@@ -374,11 +366,9 @@
     /* ===== Media Playback Functions ===== */
     function playMedia(index, startTime = 0) {
       currentIndex = index;
-      const item = playlist[index];
-      const src = item.getAttribute("data-src");
-      const type = item.getAttribute("data-type");
-      mediaPlayer.src = src;
-      if (type === "audio") {
+      const song = songs[index];
+      mediaPlayer.src = song.src;
+      if (song.type === "audio") {
         mediaPlayer.setAttribute("poster", ""); // No poster for audio
       } else {
         mediaPlayer.removeAttribute("poster");
@@ -386,17 +376,11 @@
       mediaPlayer.load();
       mediaPlayer.currentTime = startTime;
       mediaPlayer.play();
-      updateNowPlaying(item.textContent.trim(), type);
-      updatePlaylistUI();
+      updateNowPlaying(song.title, song.type);
     }
-    function updateNowPlaying(text, type) {
-      trackTitle.textContent = text;
+    function updateNowPlaying(title, type) {
+      trackTitle.textContent = title;
       trackMeta.textContent = type === "audio" ? "Artist - Album" : "Video Title";
-    }
-    function updatePlaylistUI() {
-      playlist.forEach((item, idx) => {
-        item.classList.toggle("active", idx === currentIndex);
-      });
     }
 
     /* ===== Standard Controls ===== */
@@ -412,13 +396,13 @@
       playBtn.style.display = "inline-block";
     });
     nextBtn.addEventListener("click", () => {
-      if (isShuffle) currentIndex = Math.floor(Math.random() * playlist.length);
-      else currentIndex = (currentIndex + 1) % playlist.length;
+      if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
+      else currentIndex = (currentIndex + 1) % songs.length;
       playMedia(currentIndex);
     });
     prevBtn.addEventListener("click", () => {
-      if (isShuffle) currentIndex = Math.floor(Math.random() * playlist.length);
-      else currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
+      else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
       playMedia(currentIndex);
     });
     loopBtn.addEventListener("click", () => {
@@ -436,7 +420,8 @@
       else if (mediaPlayer.webkitRequestFullscreen) mediaPlayer.webkitRequestFullscreen();
     });
     managePlaylistBtn.addEventListener("click", () => {
-      window.location.href = "playlist.html";
+      // If you had a separate playlist management page, navigate to it.
+      alert("Playlist management is disabled in this version. Use the search to play songs.");
     });
 
     /* ===== Volume & Mute ===== */
@@ -482,8 +467,8 @@
       return `${minutes}:${seconds}`;
     }
 
-    /* ===== Remove Simulated Crossfade ===== */
-    // Removed the crossfade effect on pause to preserve quality
+    /* ===== Remove Unwanted Advanced Controls ===== */
+    // Pitch, Tempo, and A-B repeat functionalities have been removed.
 
     /* ===== Keyboard Shortcuts ===== */
     document.addEventListener("keydown", (e) => {
@@ -515,61 +500,35 @@
       if (audioCtx.state === "suspended") audioCtx.resume();
     });
 
-    /* ===== Drag-and-Drop Playlist Reordering & Search Filtering ===== */
-    let dragSrcEl = null;
-    function handleDragStart(e) {
-      dragSrcEl = this;
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.setData("text/html", this.outerHTML);
-      this.classList.add("dragging");
+    /* ===== Song Search Functionality ===== */
+    // Display search results based on query
+    function displaySearchResults(results) {
+      searchResultsEl.innerHTML = "";
+      results.forEach((song, idx) => {
+        const li = document.createElement("li");
+        li.textContent = song.title;
+        li.addEventListener("click", () => {
+          // When clicked, play the song and clear search results
+          const songIndex = songs.findIndex(s => s.src === song.src);
+          if (songIndex !== -1) {
+            playMedia(songIndex);
+            searchResultsEl.innerHTML = "";
+            songSearchInput.value = "";
+          }
+        });
+        searchResultsEl.appendChild(li);
+      });
     }
-    function handleDragOver(e) {
-      if (e.preventDefault) e.preventDefault();
-      this.classList.add("drag-over");
-      return false;
-    }
-    function handleDragLeave(e) {
-      this.classList.remove("drag-over");
-    }
-    function handleDrop(e) {
-      if (e.stopPropagation) e.stopPropagation();
-      if (dragSrcEl !== this) {
-        this.parentNode.removeChild(dragSrcEl);
-        const dropHTML = e.dataTransfer.getData("text/html");
-        this.insertAdjacentHTML("beforebegin", dropHTML);
-        const droppedElem = this.previousSibling;
-        addDnDHandlers(droppedElem);
-        playlist = Array.from(playlistEl.querySelectorAll("li"));
+    // On input in the search box, filter the songs list
+    songSearchInput.addEventListener("input", () => {
+      const query = songSearchInput.value.toLowerCase();
+      if (query === "") {
+        searchResultsEl.innerHTML = "";
+        return;
       }
-      this.classList.remove("drag-over");
-      return false;
-    }
-    function handleDragEnd(e) {
-      this.classList.remove("dragging");
-      playlist.forEach(item => item.classList.remove("drag-over"));
-    }
-    function addDnDHandlers(elem) {
-      elem.addEventListener("dragstart", handleDragStart, false);
-      elem.addEventListener("dragover", handleDragOver, false);
-      elem.addEventListener("dragleave", handleDragLeave, false);
-      elem.addEventListener("drop", handleDrop, false);
-      elem.addEventListener("dragend", handleDragEnd, false);
-    }
-    playlist.forEach(item => {
-      addDnDHandlers(item);
-      item.addEventListener("click", () => {
-        const idx = playlist.indexOf(item);
-        playMedia(idx);
-      });
-    });
-    // Search filtering
-    playlistSearch.addEventListener("input", () => {
-      const query = playlistSearch.value.toLowerCase();
-      playlist.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        item.style.display = text.includes(query) ? "flex" : "none";
-      });
+      const results = songs.filter(song => song.title.toLowerCase().includes(query));
+      displaySearchResults(results);
     });
   </script>
 </body>
-  </html>
+</html>
