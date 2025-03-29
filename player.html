@@ -29,23 +29,21 @@
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-dark);
+      /* Default animated background */
+      background: linear-gradient(135deg, #FF2D95, #2DFEFF, #FFDA2D);
+      background-size: 200% 200%;
+      animation: bgAnimation 10s ease infinite;
       color: var(--text-light);
       overflow-x: hidden;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      /* Animated background gradient */
-      background: linear-gradient(135deg, #FF2D95, #2DFEFF, #FFDA2D);
-      background-size: 200% 200%;
-      animation: bgAnimation 10s ease infinite;
       transition: background 0.5s;
     }
     /* Theme classes */
     body.dark { 
       background: linear-gradient(135deg, #121212, #2D2D2D, #121212);
-      color: var(--text-light);
     }
     body.neon {
       background: linear-gradient(135deg, #0d0d0d, #0a0a0a, #0d0d0d);
@@ -113,7 +111,7 @@
     canvas {
       width: 100%;
       height: 200px;
-      background: var(--bg-gradient);
+      background: var(--bg-dark);
       border-radius: var(--border-radius);
       margin: 1rem 0;
     }
@@ -174,7 +172,7 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Additional Advanced Controls */
+    /* Advanced Controls */
     .advanced-controls {
       display: flex;
       flex-wrap: wrap;
@@ -191,6 +189,18 @@
       cursor: pointer;
       transition: background var(--transition-speed);
       font-size: 0.9rem;
+    }
+    /* Playlist Search/Filter */
+    .playlist-search {
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .playlist-search input[type="text"] {
+      padding: 0.5rem;
+      width: 80%;
+      max-width: 300px;
+      border: none;
+      border-radius: var(--border-radius);
     }
     /* Playlist */
     .playlist {
@@ -215,18 +225,6 @@
     }
     .playlist li:last-child {
       border-bottom: none;
-    }
-    /* Search/Filter Input */
-    .playlist-search {
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .playlist-search input[type="text"] {
-      padding: 0.5rem;
-      width: 80%;
-      max-width: 300px;
-      border: none;
-      border-radius: var(--border-radius);
     }
     /* Drag-and-Drop Highlight */
     .drag-over {
@@ -295,7 +293,7 @@
     </div>
     <!-- Playlist -->
     <ul class="playlist" id="playlist">
-      <!-- Playlist items with both audio and video -->
+      <!-- Use correct media URLs below -->
       <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio" data-poster="">Audio Track 1 <span>➕</span></li>
       <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio" data-poster="">Audio Track 2 <span>➕</span></li>
       <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video" data-poster="">Video Track 1 <span>➕</span></li>
@@ -304,9 +302,7 @@
 
   <!-- Embedded JavaScript -->
   <script>
-    /* ============
-       DOM Elements
-       ============ */
+    /* ===== DOM Elements ===== */
     const mediaPlayer = document.getElementById("media-player");
     const playBtn = document.getElementById("play");
     const pauseBtn = document.getElementById("pause");
@@ -336,9 +332,7 @@
     const pitchSlider = document.getElementById("pitch");
     const tempoSlider = document.getElementById("tempo");
 
-    /* ============
-       Player State
-       ============ */
+    /* ===== Player State ===== */
     let playlist = Array.from(playlistEl.querySelectorAll("li"));
     let currentIndex = 0;
     let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
@@ -346,9 +340,7 @@
     let muted = false;
     let repeatA = null, repeatB = null; // For A-B Repeat
 
-    /* ============
-       Auto-Save & Load Last Position
-       ============ */
+    /* ===== Auto-Save & Load Last Position ===== */
     window.addEventListener("load", () => {
       const savedIndex = localStorage.getItem("lastIndex");
       const savedTime = localStorage.getItem("lastTime");
@@ -362,12 +354,10 @@
       localStorage.setItem("lastTime", mediaPlayer.currentTime);
     });
 
-    /* ============
-       Web Audio API Setup (Visualizer & Equalizer)
-       ============ */
+    /* ===== Web Audio API Setup (Visualizer & Equalizer) ===== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const sourceNode = audioCtx.createMediaElementSource(mediaPlayer);
-    // Create three filters for equalizer: bass, mid, treble
+    // Equalizer filters: bass, mid, treble
     const bassFilter = audioCtx.createBiquadFilter();
     bassFilter.type = "lowshelf";
     bassFilter.frequency.value = 200;
@@ -377,7 +367,7 @@
     const trebleFilter = audioCtx.createBiquadFilter();
     trebleFilter.type = "highshelf";
     trebleFilter.frequency.value = 3000;
-    // Create analyser for visualizer
+    // Analyser for visualizer
     const analyser = audioCtx.createAnalyser();
     analyser.fftSize = 256;
     const bufferLength = analyser.frequencyBinCount;
@@ -389,9 +379,7 @@
     trebleFilter.connect(analyser);
     analyser.connect(audioCtx.destination);
 
-    /* ============
-       Visualizer Function
-       ============ */
+    /* ===== Visualizer ===== */
     function drawVisualizer() {
       requestAnimationFrame(drawVisualizer);
       analyser.getByteFrequencyData(dataArray);
@@ -414,9 +402,7 @@
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    /* ============
-       Theme Toggle
-       ============ */
+    /* ===== Theme Toggle ===== */
     let themeState = 0; // 0: dark (default), 1: neon, 2: light
     themeToggleBtn.addEventListener("click", () => {
       themeState = (themeState + 1) % 3;
@@ -426,18 +412,15 @@
       else if (themeState === 2) document.body.classList.add("light");
     });
 
-    /* ============
-       Media Playback Functions
-       ============ */
+    /* ===== Media Playback Functions ===== */
     function playMedia(index, startTime = 0) {
       currentIndex = index;
       const item = playlist[index];
       const src = item.getAttribute("data-src");
       const type = item.getAttribute("data-type");
-      // Set media source and poster (if audio, use album art; for video, you may set a poster)
       mediaPlayer.src = src;
       if (type === "audio") {
-        mediaPlayer.setAttribute("poster", ""); // You can add a default album art URL if needed.
+        mediaPlayer.setAttribute("poster", ""); // No poster for audio
       } else {
         mediaPlayer.removeAttribute("poster");
       }
@@ -450,8 +433,7 @@
     function updateNowPlaying(text, type) {
       trackTitle.textContent = text;
       trackMeta.textContent = type === "audio" ? "Artist - Album" : "Video Title";
-      // For album art, you can reintroduce an image if available
-      // Here, we leave the placeholder intact.
+      // Album art remains from the default placeholder
     }
     function updatePlaylistUI() {
       playlist.forEach((item, idx) => {
@@ -459,9 +441,7 @@
       });
     }
 
-    /* ============
-       Standard Controls
-       ============ */
+    /* ===== Standard Controls ===== */
     playBtn.addEventListener("click", () => {
       if (!mediaPlayer.src) playMedia(currentIndex);
       else mediaPlayer.play();
@@ -498,12 +478,10 @@
       else if (mediaPlayer.webkitRequestFullscreen) mediaPlayer.webkitRequestFullscreen();
     });
     managePlaylistBtn.addEventListener("click", () => {
-      window.location.href = "playlist.html"; // Ensure you create playlist.html
+      window.location.href = "playlist.html";
     });
 
-    /* ============
-       Volume & Mute
-       ============ */
+    /* ===== Volume & Mute ===== */
     volumeSlider.addEventListener("input", () => {
       mediaPlayer.volume = volumeSlider.value;
       if (mediaPlayer.volume > 0) {
@@ -517,9 +495,7 @@
       muteBtn.textContent = muted ? "Unmute" : "Mute";
     });
 
-    /* ============
-       Seek Bar & Tooltip
-       ============ */
+    /* ===== Seek Bar & Tooltip ===== */
     mediaPlayer.addEventListener("timeupdate", () => {
       const percent = (mediaPlayer.currentTime / mediaPlayer.duration) * 100;
       progressBar.style.width = percent + "%";
@@ -552,9 +528,7 @@
       return `${minutes}:${seconds}`;
     }
 
-    /* ============
-       Advanced Controls: A-B Repeat, Pitch, Tempo
-       ============ */
+    /* ===== Advanced Controls: A-B Repeat, Pitch, Tempo ===== */
     setABtn.addEventListener("click", () => {
       repeatA = mediaPlayer.currentTime;
       alert("Point A set at " + formatTime(repeatA));
@@ -568,13 +542,34 @@
       repeatB = null;
       alert("A-B Repeat cleared");
     });
-    // For Pitch and Tempo, UI elements are present.
-    // NOTE: Actual pitch-shifting and tempo adjustments require advanced DSP processing.
     pitchSlider.addEventListener("input", () => {
-      // Placeholder: Display current pitch value.
       console.log("Pitch set to: " + pitchSlider.value + " semitones");
     });
     tempoSlider.addEventListener("input", () => {
-      // Placeholder: Display current tempo value.
       console.log("Tempo set to: " + tempoSlider.value + "x");
-  
+    });
+
+    /* ===== Drag-and-Drop Playlist Reordering & Search Filtering ===== */
+    let dragSrcEl = null;
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/html", this.outerHTML);
+      this.classList.add("dragging");
+    }
+    function handleDragOver(e) {
+      if (e.preventDefault) e.preventDefault();
+      this.classList.add("drag-over");
+      return false;
+    }
+    function handleDragLeave(e) {
+      this.classList.remove("drag-over");
+    }
+    function handleDrop(e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (dragSrcEl !== this) {
+        this.parentNode.removeChild(dragSrcEl);
+        const dropHTML = e.dataTransfer.getData("text/html");
+        this.insertAdjacentHTML("beforebegin", dropHTML);
+        const droppedElem = this.previousSibling;
+        addDnDHandlers(d
