@@ -45,6 +45,27 @@
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
     }
+    .controls {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .controls button,
+    .controls input[type="text"] {
+      background: var(--secondary-color);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: background var(--transition-speed);
+      font-size: 1rem;
+    }
+    .controls button:hover,
+    .controls input[type="text"]:hover {
+      background: var(--accent-color);
+    }
     .playlist {
       list-style: none;
       padding: 0.5rem;
@@ -68,30 +89,9 @@
     .drag-over {
       border: 2px dashed var(--accent-color);
     }
-    .controls {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 1rem;
-    }
-    .controls button,
-    .controls input[type="text"] {
-      background: var(--secondary-color);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: background var(--transition-speed);
-      font-size: 1rem;
-    }
-    .controls button:hover,
-    .controls input[type="text"]:hover {
-      background: var(--accent-color);
-    }
     .back-btn {
-      margin-top: 1rem;
       text-align: center;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -101,17 +101,17 @@
   </header>
   <div class="container">
     <div class="controls">
-      <input type="text" id="newSongURL" placeholder="Song URL (audio or video)" />
+      <input type="text" id="newSongURL" placeholder="Song URL (audio/video)" />
       <input type="text" id="newSongTitle" placeholder="Song Title" />
       <input type="text" id="newSongType" placeholder="Type (audio/video)" />
       <input type="text" id="newSongPoster" placeholder="Poster URL (optional)" />
       <button id="addSong">Add Song</button>
     </div>
     <ul class="playlist" id="manage-playlist">
-      <!-- Initial playlist items (should match the main player's playlist) -->
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio" data-poster="https://via.placeholder.com/80x80.png?text=Art">Audio Track 1</li>
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio" data-poster="https://via.placeholder.com/80x80.png?text=Art">Audio Track 2</li>
-      <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video" data-poster="https://via.placeholder.com/80x80.png?text=Video">Video Track 1</li>
+      <!-- Initial playlist items matching the main player -->
+      <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio" data-poster="">Audio Track 1</li>
+      <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio" data-poster="">Audio Track 2</li>
+      <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video" data-poster="">Video Track 1</li>
     </ul>
     <div class="controls">
       <button id="savePlaylist">Save Playlist</button>
@@ -122,7 +122,7 @@
   </div>
   
   <script>
-    // Basic in-page playlist management
+    // DOM elements for playlist management
     const managePlaylistEl = document.getElementById("manage-playlist");
     const addSongBtn = document.getElementById("addSong");
     const newSongURL = document.getElementById("newSongURL");
@@ -132,12 +132,12 @@
     const savePlaylistBtn = document.getElementById("savePlaylist");
     const backToPlayerBtn = document.getElementById("backToPlayer");
 
-    // Function to add new song to the playlist list
+    // Add new song to the playlist
     addSongBtn.addEventListener("click", () => {
       const url = newSongURL.value.trim();
       const title = newSongTitle.value.trim() || "New Song";
       const type = newSongType.value.trim().toLowerCase() || "audio";
-      const poster = newSongPoster.value.trim() || "https://via.placeholder.com/80x80.png?text=Art";
+      const poster = newSongPoster.value.trim() || "";
       if (!url) {
         alert("Please enter a valid song URL.");
         return;
@@ -156,7 +156,7 @@
       newSongPoster.value = "";
     });
 
-    // Function to add drag-and-drop handlers
+    // Drag-and-Drop handlers
     let dragSrcEl = null;
     function handleDragStart(e) {
       dragSrcEl = this;
@@ -199,7 +199,7 @@
     // Add handlers to existing items
     Array.from(managePlaylistEl.children).forEach(item => addDnDHandlers(item));
 
-    // Save playlist button (for demo purposes, just alert the new list)
+    // Save Playlist (for demo, just alert JSON data)
     savePlaylistBtn.addEventListener("click", () => {
       const items = managePlaylistEl.querySelectorAll("li");
       let playlistData = [];
@@ -211,7 +211,6 @@
           title: item.textContent
         });
       });
-      // For a real app, you might save this to localStorage or a server.
       alert("Playlist saved:\n" + JSON.stringify(playlistData, null, 2));
     });
     // Back to main player page
@@ -220,4 +219,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
