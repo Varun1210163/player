@@ -172,24 +172,6 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Advanced Controls */
-    .advanced-controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-    .advanced-controls button,
-    .advanced-controls input[type="range"] {
-      background: var(--secondary-color);
-      border: none;
-      border-radius: var(--border-radius);
-      padding: 0.5rem;
-      cursor: pointer;
-      transition: background var(--transition-speed);
-      font-size: 0.9rem;
-    }
     /* Playlist Search/Filter */
     .playlist-search {
       margin-bottom: 1rem;
@@ -271,32 +253,16 @@
         <button id="mute">Mute</button>
       </div>
     </div>
-    <!-- Advanced Controls -->
-    <div class="advanced-controls">
-      <!-- A-B Repeat Controls -->
-      <button id="setA">Set A</button>
-      <button id="setB">Set B</button>
-      <button id="clearAB">Clear AB</button>
-      <!-- Pitch and Tempo (UI Only) -->
-      <div class="slider-container">
-        <label for="pitch">Pitch</label>
-        <input type="range" id="pitch" min="-12" max="12" step="1" value="0">
-      </div>
-      <div class="slider-container">
-        <label for="tempo">Tempo</label>
-        <input type="range" id="tempo" min="0.5" max="1.5" step="0.05" value="1">
-      </div>
-    </div>
     <!-- Playlist Search/Filter -->
     <div class="playlist-search">
       <input type="text" id="playlistSearch" placeholder="Search Playlist...">
     </div>
     <!-- Playlist -->
     <ul class="playlist" id="playlist">
-      <!-- Use correct media URLs below -->
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio" data-poster="">Audio Track 1 <span>➕</span></li>
-      <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio" data-poster="">Audio Track 2 <span>➕</span></li>
-      <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video" data-poster="">Video Track 1 <span>➕</span></li>
+      <!-- Correct media URLs inserted -->
+      <li draggable="true" data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio">Audio Track 1 <span>➕</span></li>
+      <li draggable="true" data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio">Audio Track 2 <span>➕</span></li>
+      <li draggable="true" data-src="https://www.w3schools.com/html/mov_bbb.mp4" data-type="video">Video Track 1 <span>➕</span></li>
     </ul>
   </div>
 
@@ -325,12 +291,6 @@
     const ctx = visualizer.getContext("2d");
     const playlistEl = document.getElementById("playlist");
     const playlistSearch = document.getElementById("playlistSearch");
-    /* Advanced Controls */
-    const setABtn = document.getElementById("setA");
-    const setBBtn = document.getElementById("setB");
-    const clearABBtn = document.getElementById("clearAB");
-    const pitchSlider = document.getElementById("pitch");
-    const tempoSlider = document.getElementById("tempo");
 
     /* ===== Player State ===== */
     let playlist = Array.from(playlistEl.querySelectorAll("li"));
@@ -338,7 +298,6 @@
     let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
     let isShuffle = false;
     let muted = false;
-    let repeatA = null, repeatB = null; // For A-B Repeat
 
     /* ===== Auto-Save & Load Last Position ===== */
     window.addEventListener("load", () => {
@@ -357,7 +316,7 @@
     /* ===== Web Audio API Setup (Visualizer & Equalizer) ===== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const sourceNode = audioCtx.createMediaElementSource(mediaPlayer);
-    // Equalizer filters: bass, mid, treble
+    // Create equalizer filters: bass, mid, treble
     const bassFilter = audioCtx.createBiquadFilter();
     bassFilter.type = "lowshelf";
     bassFilter.frequency.value = 200;
@@ -433,7 +392,6 @@
     function updateNowPlaying(text, type) {
       trackTitle.textContent = text;
       trackMeta.textContent = type === "audio" ? "Artist - Album" : "Video Title";
-      // Album art remains from the default placeholder
     }
     function updatePlaylistUI() {
       playlist.forEach((item, idx) => {
@@ -499,10 +457,6 @@
     mediaPlayer.addEventListener("timeupdate", () => {
       const percent = (mediaPlayer.currentTime / mediaPlayer.duration) * 100;
       progressBar.style.width = percent + "%";
-      // A-B Repeat check:
-      if (repeatA !== null && repeatB !== null && mediaPlayer.currentTime >= repeatB) {
-        mediaPlayer.currentTime = repeatA;
-      }
     });
     seekBar.addEventListener("click", (e) => {
       const rect = seekBar.getBoundingClientRect();
@@ -528,25 +482,37 @@
       return `${minutes}:${seconds}`;
     }
 
-    /* ===== Advanced Controls: A-B Repeat, Pitch, Tempo ===== */
-    setABtn.addEventListener("click", () => {
-      repeatA = mediaPlayer.currentTime;
-      alert("Point A set at " + formatTime(repeatA));
+    /* ===== Remove Simulated Crossfade ===== */
+    // Removed the crossfade effect on pause to preserve quality
+
+    /* ===== Keyboard Shortcuts ===== */
+    document.addEventListener("keydown", (e) => {
+      switch(e.key) {
+        case " ":
+          e.preventDefault();
+          if (mediaPlayer.paused) playBtn.click();
+          else pauseBtn.click();
+          break;
+        case "ArrowRight":
+          nextBtn.click();
+          break;
+        case "ArrowLeft":
+          prevBtn.click();
+          break;
+        case "ArrowUp":
+          volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+        case "ArrowDown":
+          volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+      }
     });
-    setBBtn.addEventListener("click", () => {
-      repeatB = mediaPlayer.currentTime;
-      alert("Point B set at " + formatTime(repeatB));
-    });
-    clearABBtn.addEventListener("click", () => {
-      repeatA = null;
-      repeatB = null;
-      alert("A-B Repeat cleared");
-    });
-    pitchSlider.addEventListener("input", () => {
-      console.log("Pitch set to: " + pitchSlider.value + " semitones");
-    });
-    tempoSlider.addEventListener("input", () => {
-      console.log("Tempo set to: " + tempoSlider.value + "x");
+
+    /* ===== Resume AudioContext on Interaction ===== */
+    document.body.addEventListener("click", () => {
+      if (audioCtx.state === "suspended") audioCtx.resume();
     });
 
     /* ===== Drag-and-Drop Playlist Reordering & Search Filtering ===== */
@@ -604,49 +570,6 @@
         item.style.display = text.includes(query) ? "flex" : "none";
       });
     });
-
-    /* ===== Keyboard Shortcuts ===== */
-    document.addEventListener("keydown", (e) => {
-      switch(e.key) {
-        case " ":
-          e.preventDefault();
-          if (mediaPlayer.paused) playBtn.click();
-          else pauseBtn.click();
-          break;
-        case "ArrowRight":
-          nextBtn.click();
-          break;
-        case "ArrowLeft":
-          prevBtn.click();
-          break;
-        case "ArrowUp":
-          volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
-          volumeSlider.dispatchEvent(new Event("input"));
-          break;
-        case "ArrowDown":
-          volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
-          volumeSlider.dispatchEvent(new Event("input"));
-          break;
-      }
-    });
-
-    /* ===== Simulated Crossfade on Pause (Simple Fade-Out) ===== */
-    mediaPlayer.addEventListener("pause", () => {
-      let vol = mediaPlayer.volume;
-      const fade = setInterval(() => {
-        if (vol > 0.1) {
-          vol -= 0.1;
-          mediaPlayer.volume = vol;
-        } else {
-          clearInterval(fade);
-        }
-      }, 50);
-    });
-
-    /* ===== Resume AudioContext on Interaction ===== */
-    document.body.addEventListener("click", () => {
-      if (audioCtx.state === "suspended") audioCtx.resume();
-    });
   </script>
 </body>
-</html>
+  </html>
