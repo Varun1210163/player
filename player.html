@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultra Advanced Music Website - Music Player</title>
-  <meta name="description" content="A futuristic, ultra-advanced music website with vibrant colors, animations, and an advanced music player.">
+  <title>Ultra Advanced Vibrant Music Player</title>
+  <meta name="description" content="A vibrant, ultra-advanced music player with dynamic visuals, advanced controls, and interactive playlist management.">
   <meta name="author" content="Varun Prasath">
-  <!-- Embedded CSS (includes common styles plus music player specific styles) -->
+  <!-- Embedded CSS -->
   <style>
-    /* Vibrant Color Theme */
+    /* Base & Vibrant Theme */
     :root {
       --primary-color: #FF2D95;
       --secondary-color: #2DFEFF;
       --accent-color: #FFDA2D;
-      --bg-dark: #1a1a1a;
-      --bg-darker: #121212;
+      --bg-dark: #121212;
+      --bg-gradient: linear-gradient(135deg, #FF2D95, #2DFEFF, #FFDA2D);
       --text-light: #ffffff;
       --border-radius: 8px;
       --transition-speed: 0.3s;
-      --shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+      --shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    /* Basic Global Styles */
+
     * {
       margin: 0;
       padding: 0;
@@ -31,550 +31,495 @@
       background: var(--bg-dark);
       color: var(--text-light);
       overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
     }
     header {
-      background: var(--primary-color);
+      width: 100%;
       padding: 1rem;
       text-align: center;
-      font-size: 2rem;
-      font-weight: bold;
+      background: var(--primary-color);
       box-shadow: var(--shadow);
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 100;
     }
-    /* Navigation */
-    nav ul {
-      list-style: none;
+    header h1 {
+      font-size: 2rem;
+    }
+    /* Main Container */
+    .container {
+      width: 90%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: rgba(0,0,0,0.7);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+    }
+    /* Now Playing Section */
+    .now-playing {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .now-playing h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .now-playing p {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+    /* Lyrics Section */
+    .lyrics {
+      background: rgba(255,255,255,0.1);
+      padding: 0.5rem;
+      margin: 1rem 0;
+      border-radius: var(--border-radius);
+      max-height: 120px;
+      overflow: hidden;
+      position: relative;
+    }
+    .lyrics p {
+      text-align: center;
+      line-height: 1.5;
+      animation: scrollLyrics 10s linear infinite;
+    }
+    @keyframes scrollLyrics {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-30%); }
+      100% { transform: translateY(0); }
+    }
+    /* Controls */
+    .controls {
       display: flex;
       justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 1rem;
+      margin-bottom: 1rem;
     }
-    nav a {
-      color: var(--text-light);
-      text-decoration: none;
-      font-weight: bold;
-      transition: color var(--transition-speed);
+    .controls button,
+    .controls input[type="range"] {
+      background: var(--secondary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+      font-size: 1rem;
     }
-    nav a:hover {
-      color: var(--accent-color);
+    .controls button:hover,
+    .controls input[type="range"]:hover {
+      background: var(--accent-color);
     }
-    /* (Optional) Hero styles in case you want consistency */
-    .hero {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      background-size: 200% 200%;
-      animation: gradientFlow 10s ease infinite;
-      padding: 4rem 2rem;
-      text-align: center;
+    .controls .active {
+      background: var(--accent-color);
     }
-    @keyframes gradientFlow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    /* Music Player & Related Styles */
-    .music-player {
-      max-width: 800px;
-      margin: 2rem auto;
-      text-align: center;
+    /* Seek Bar */
+    .seek-bar {
+      width: 100%;
+      background: #333;
+      height: 8px;
+      border-radius: var(--border-radius);
+      margin: 1rem 0;
+      position: relative;
+      cursor: pointer;
     }
+    .seek-bar .progress {
+      height: 100%;
+      background: var(--primary-color);
+      width: 0%;
+      border-radius: var(--border-radius);
+      transition: width 0.1s;
+    }
+    .seek-tooltip {
+      position: absolute;
+      top: -25px;
+      background: rgba(0,0,0,0.8);
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      display: none;
+      white-space: nowrap;
+    }
+    /* Visualizer */
     canvas {
       width: 100%;
       height: 200px;
-      background: #000;
-    }
-    .controls button {
-      font-size: 1.5rem;
-      margin: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--secondary-color);
-      border: none;
+      background: var(--bg-gradient);
       border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: background var(--transition-speed);
+      margin-bottom: 1rem;
     }
-    .controls button:hover {
-      background: var(--accent-color);
-    }
-    .progress-container {
-      width: 80%;
-      height: 10px;
-      background: #333;
-      margin: 1rem auto;
-      cursor: pointer;
-      border-radius: var(--border-radius);
-    }
-    .progress {
-      height: 100%;
-      background: var(--primary-color);
-      width: 0;
-      border-radius: var(--border-radius);
-    }
-    .volume-container {
-      margin: 1rem;
-    }
-    /* Playlist Manager & Search Styles */
-    .playlist-container, .search-container {
-      max-width: 800px;
-      margin: 1rem auto;
-      text-align: center;
-    }
-    .playlist-container input,
-    .search-container input {
-      padding: 0.5rem;
-      border-radius: var(--border-radius);
-      border: 1px solid #ccc;
-    }
-    .playlist-container button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
-      border-radius: var(--border-radius);
-      border: none;
-      background: var(--secondary-color);
-      cursor: pointer;
-      transition: background var(--transition-speed);
-    }
-    .playlist-container button:hover {
-      background: var(--accent-color);
-    }
-    .playlist, .user-playlist {
+    /* Playlist */
+    .playlist {
       list-style: none;
-      max-width: 800px;
-      margin: 1rem auto;
-      padding: 0;
-    }
-    .playlist li, .user-playlist li {
-      background: #222;
-      margin: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      margin: 1rem 0;
       padding: 0.5rem;
+      background: rgba(255,255,255,0.05);
       border-radius: var(--border-radius);
+    }
+    .playlist li {
+      padding: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .playlist li button, .user-playlist li button {
-      margin-left: 1rem;
-      background: var(--secondary-color);
-      border: none;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      transition: background var(--transition-speed);
+    .playlist li.active {
+      background: rgba(255,255,255,0.1);
     }
-    .playlist li button:hover, .user-playlist li button:hover {
-      background: var(--accent-color);
+    .playlist li:last-child {
+      border-bottom: none;
+    }
+    /* Drag-and-Drop Highlight */
+    .drag-over {
+      border: 2px dashed var(--accent-color);
     }
   </style>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVCH6ZD4TM"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    
-    gtag('config', 'G-TVCH6ZD4TM');
-  </script>
 </head>
 <body>
   <header>
-    <nav>
-      <ul>
-        <li>
-          <a href="index.html">Home</a>
-        </li>
-        <li>
-          <a href="#about">About</a>
-        </li>
-        <li>
-          <a href="player.html">Music</a>
-        </li>
-      </ul>
-    </nav>
+    <h1>Ultra Advanced Vibrant Music Player</h1>
   </header>
-  <!-- Music Player Section -->
-  <section id="music">
-    <h2>Music Player</h2>
-    <div class="music-player">
-      <canvas id="visualizer"></canvas>
-        
-      <audio id="audio-player">
-        <source src="https://varun1210163.github.io/music/song1.mp3" type="audio/mpeg">
-        Your browser does not support audio.
-      </audio>
-    
-      <div class="controls">
-        <button id="prev">⏮️</button>
-        <button id="play">▶️</button>
-        <button id="pause">⏸️</button>
-        <button id="next">⏭️</button>
-        <button id="loop">🔁 Loop Off</button>
-      </div>
-    
-      <div class="progress-container" id="progress-container">
-        <div class="progress" id="progress"></div>
-      </div>
-      <div id="time-display">0:00 / 0:00</div>
-    
-      <div class="volume-container">
-        <label for="volume">Volume:</label>
+  <div class="container">
+    <!-- Now Playing & Metadata -->
+    <div class="now-playing">
+      <h2 id="track-title">Track Title Placeholder</h2>
+      <p id="track-info">Artist - Album</p>
+    </div>
+    <!-- Visualizer -->
+    <canvas id="visualizer"></canvas>
+    <!-- Seek Bar -->
+    <div class="seek-bar" id="seek-bar">
+      <div class="progress" id="progress"></div>
+      <div class="seek-tooltip" id="seek-tooltip">0:00</div>
+    </div>
+    <!-- Controls -->
+    <div class="controls">
+      <button id="prev">⏮️</button>
+      <button id="play">▶️</button>
+      <button id="pause" style="display:none;">⏸️</button>
+      <button id="next">⏭️</button>
+      <button id="loop">Loop Off</button>
+      <button id="shuffle">Shuffle Off</button>
+      <div class="slider-container">
+        <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+        <button id="mute">Mute</button>
       </div>
-    </div> <!-- 🎵 End of .music-player -->
-    
-    <!-- 🎵 Playlist Manager -->
-    <div class="playlist-container">
-      <h3>Create & Manage Playlists</h3>
-      <input type="text" id="playlist-name" placeholder="Enter Playlist Name">
-      <button id="create-playlist">➕ Create Playlist</button>
-      <select id="playlist-selector"></select>
-      <button id="rename-playlist">✏️ Rename</button>
+      <div class="slider-container">
+        <label for="speed">Speed</label>
+        <input type="range" id="speed" min="0.5" max="3" step="0.1" value="1">
+      </div>
     </div>
-    
-    <!-- Search Box for Filtering Songs -->
-    <div class="search-container" style="text-align:center; margin-top:1rem;">
-      <input type="text" id="search-box" oninput="searchSongs()" placeholder="Search Songs..."
-        style="padding: 0.5rem; border-radius: var(--border-radius); border: 1px solid #ccc;">
+    <!-- Lyrics Section -->
+    <div class="lyrics" id="lyrics">
+      <p>These are sample lyrics that scroll with the music... ♪ La la la... ♪ La la la...</p>
     </div>
-    
-    <!-- 🎶 Available Songs -->
-    <h3>Available Songs</h3>
-    <ul class="playlist" id="available-songs">
-      <li data-src="https://varun1210163.github.io/music/song1.mp3" data-type="audio">
-        Refreshing music of Doraemon   
-        <button class="add-to-playlist">➕</button>
-      </li>
-      <li data-src="https://varun1210163.github.io/music/song2.mp3" data-type="audio">
-        Doraemon Explorer Bow Bow BGM   
-        <button class="add-to-playlist">➕</button>
-      </li>
+    <!-- Playlist -->
+    <ul class="playlist" id="playlist">
+      <li draggable="true" data-src="song1.mp3">Track 1 <span>➕</span></li>
+      <li draggable="true" data-src="song2.mp3">Track 2 <span>➕</span></li>
+      <li draggable="true" data-src="song3.mp3">Track 3 <span>➕</span></li>
     </ul>
-    
-    <!-- 🎵 User Playlist (Supports Multiple Playlists) -->
-    <h3>Current Playlist: <span id="current-playlist-name">None</span></h3>
-    <ul class="user-playlist" id="user-playlist"></ul>
-    
-  </section> <!-- 🔚 End of Music Section -->
-  <!-- Footer -->
-  <footer>
-    <p>© 2025 Ultra Advanced Music Website. All Rights Reserved.</p>
-  </footer>
+    <!-- Hidden Audio Element -->
+    <audio id="audio-player" preload="metadata">
+      <source src="https://varun1210163.github.io/music/song1.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
   <!-- Embedded JavaScript -->
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-  // ========================
-  // Audio Player & Controls
-  // ========================
-  const audioPlayer = document.getElementById("audio-player");
-  const playButton = document.getElementById("play");
-  const pauseButton = document.getElementById("pause");
-  const nextButton = document.getElementById("next");
-  const prevButton = document.getElementById("prev");
-  const progressContainer = document.getElementById("progress-container");
-  const progress = document.getElementById("progress");
-  const timeDisplay = document.getElementById("time-display");
-  const volumeSlider = document.getElementById("volume");
-  
-  // Get available songs from the available songs list
-  const availableSongsList = document.getElementById("available-songs");
-  let currentSongIndex = 0;
-  const availableSongs = Array.from(availableSongsList.querySelectorAll("li"));
-  
-  function playSong(index) {
-    const song = availableSongs[index];
-    audioPlayer.src = song.getAttribute("data-src");
-    audioPlayer.play();
-    // Mark active song
-    availableSongs.forEach((item) => item.classList.remove("active"));
-    song.classList.add("active");
-    currentSongIndex = index;
-  }
-  
-  playButton.addEventListener("click", () => {
-    if (!audioPlayer.src) playSong(currentSongIndex);
-    else audioPlayer.play();
-  });
-  
-  pauseButton.addEventListener("click", () => {
-    audioPlayer.pause();
-  });
-  
-  nextButton.addEventListener("click", () => {
-    currentSongIndex = (currentSongIndex + 1) % availableSongs.length;
-    playSong(currentSongIndex);
-  });
-  
-  prevButton.addEventListener("click", () => {
-    currentSongIndex = (currentSongIndex - 1 + availableSongs.length) % availableSongs.length;
-    playSong(currentSongIndex);
-  });
-  
-  audioPlayer.addEventListener("timeupdate", () => {
-    const { duration, currentTime } = audioPlayer;
-    if (duration) {
-      const percent = (currentTime / duration) * 100;
-      progress.style.width = percent + "%";
-      let curMins = Math.floor(currentTime / 60);
-      let curSecs = String(Math.floor(currentTime % 60)).padStart(2, "0");
-      let durMins = Math.floor(duration / 60);
-      let durSecs = String(Math.floor(duration % 60)).padStart(2, "0");
-      timeDisplay.textContent = `${curMins}:${curSecs} / ${durMins}:${durSecs}`;
+    // Get elements
+    const audio = document.getElementById("audio-player");
+    const playBtn = document.getElementById("play");
+    const pauseBtn = document.getElementById("pause");
+    const nextBtn = document.getElementById("next");
+    const prevBtn = document.getElementById("prev");
+    const loopBtn = document.getElementById("loop");
+    const shuffleBtn = document.getElementById("shuffle");
+    const volumeSlider = document.getElementById("volume");
+    const muteBtn = document.getElementById("mute");
+    const speedSlider = document.getElementById("speed");
+    const progressBar = document.getElementById("progress");
+    const seekBar = document.getElementById("seek-bar");
+    const seekTooltip = document.getElementById("seek-tooltip");
+    const trackTitle = document.getElementById("track-title");
+    const trackInfo = document.getElementById("track-info");
+    const playlistEl = document.getElementById("playlist");
+    const visualizer = document.getElementById("visualizer");
+    const ctx = visualizer.getContext("2d");
+
+    // Player state
+    let playlist = Array.from(playlistEl.querySelectorAll("li"));
+    let currentIndex = 0;
+    let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
+    let isShuffle = false;
+    let muted = false;
+
+    // Setup audio context for visualizer
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    const source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+
+    // Visualizer function
+    function drawVisualizer() {
+      requestAnimationFrame(drawVisualizer);
+      analyser.getByteFrequencyData(dataArray);
+      ctx.fillStyle = "#121212";
+      ctx.fillRect(0, 0, visualizer.width, visualizer.height);
+      const barWidth = (visualizer.width / bufferLength) * 2.5;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const barHeight = dataArray[i];
+        ctx.fillStyle = `rgb(${barHeight+100},50,150)`;
+        ctx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
+        x += barWidth + 1;
+      }
     }
-  });
-  
-  progressContainer.addEventListener("click", (e) => {
-    const width = progressContainer.clientWidth;
-    const clickX = e.offsetX;
-    const duration = audioPlayer.duration;
-    if (duration) audioPlayer.currentTime = (clickX / width) * duration;
-  });
-  
-  volumeSlider.addEventListener("input", () => {
-    audioPlayer.volume = volumeSlider.value;
-  });
-  
-  audioPlayer.addEventListener("ended", () => {
-    nextButton.click();
-  });
-  
-  // ========================
-  // Audio Visualizer
-  // ========================
-  const canvas = document.getElementById("visualizer");
-  const canvasCtx = canvas.getContext("2d");
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  const source = audioCtx.createMediaElementSource(audioPlayer);
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  
-  function drawVisualizer() {
-    requestAnimationFrame(drawVisualizer);
-    // Resize canvas dynamically
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-    analyser.getByteFrequencyData(dataArray);
-    canvasCtx.fillStyle = "#000";
-    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-    const barWidth = (canvas.width / bufferLength) * 2.5;
-    let x = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      let barHeight = dataArray[i];
-      let red = barHeight + 25 * (i / bufferLength);
-      let green = 250 * (i / bufferLength);
-      let blue = 50;
-      canvasCtx.fillStyle = `rgb(${red},${green},${blue})`;
-      canvasCtx.fillRect(x, canvas.height - barHeight / 2, barWidth, barHeight / 2);
-      x += barWidth + 1;
+    drawVisualizer();
+
+    // Resize canvas to match container
+    function resizeCanvas() {
+      visualizer.width = visualizer.clientWidth;
+      visualizer.height = visualizer.clientHeight;
     }
-  }
-  drawVisualizer();
-  
-  document.body.addEventListener("click", () => {
-    if (audioCtx.state === "suspended") audioCtx.resume();
-  });
-  
-  // ========================
-  // Search Functionality
-  // ========================
-  window.searchSongs = function () {
-    let input = document.getElementById("search-box").value.toLowerCase();
-    const songItems = availableSongsList.querySelectorAll("li");
-    songItems.forEach((song) => {
-      let text = song.textContent.toLowerCase();
-      song.style.display = text.includes(input) ? "block" : "none";
-    });
-  };
-  
-  // ========================
-  // Advanced Playlist Management with IndexedDB
-  // ========================
-  let db;
-  const dbRequest = indexedDB.open("MusicPlaylists", 1);
-  dbRequest.onupgradeneeded = function (e) {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("playlists")) {
-      db.createObjectStore("playlists", { keyPath: "name" });
-    }
-  };
-  dbRequest.onsuccess = function (e) {
-    db = e.target.result;
-    loadPlaylists();
-  };
-  dbRequest.onerror = function (e) {
-    console.error("IndexedDB error:", e.target.error);
-  };
-  
-  const playlistSelector = document.getElementById("playlist-selector");
-  const playlistNameInput = document.getElementById("playlist-name");
-  const userPlaylist = document.getElementById("user-playlist");
-  const currentPlaylistName = document.getElementById("current-playlist-name");
-  const renamePlaylistButton = document.getElementById("rename-playlist");
-  
-  function savePlaylist(name, songs) {
-    const transaction = db.transaction(["playlists"], "readwrite");
-    const store = transaction.objectStore("playlists");
-    store.put({ name, songs });
-  }
-  
-  function loadPlaylists() {
-    const transaction = db.transaction(["playlists"], "readonly");
-    const store = transaction.objectStore("playlists");
-    const request = store.getAll();
-    request.onsuccess = function (e) {
-      const playlists = e.target.result;
-      playlistSelector.innerHTML = "";
-      playlists.forEach((pl) => {
-        const option = document.createElement("option");
-        option.value = pl.name;
-        option.textContent = pl.name;
-        playlistSelector.appendChild(option);
-      });
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    // Play current song
+    function playSong(index) {
+      currentIndex = index;
+      const songItem = playlist[index];
+      audio.src = songItem.getAttribute("data-src");
+      audio.play();
+      updateNowPlaying(songItem.textContent);
       updatePlaylistUI();
-    };
-  }
-  
-  function updatePlaylistUI() {
-    userPlaylist.innerHTML = "";
-    const currentPlaylist = playlistSelector.value;
-    currentPlaylistName.textContent = currentPlaylist || "None";
-    if (!currentPlaylist) return;
-    const transaction = db.transaction(["playlists"], "readonly");
-    const store = transaction.objectStore("playlists");
-    const request = store.get(currentPlaylist);
-    request.onsuccess = function (e) {
-      const playlist = e.target.result;
-      if (playlist && playlist.songs.length > 0) {
-        playlist.songs.forEach((song, index) => {
-          const li = document.createElement("li");
-          li.textContent = song.name;
-          li.setAttribute("data-src", song.src);
-          li.draggable = true;
-          li.classList.add("draggable");
-          // Remove Button
-          const removeBtn = document.createElement("button");
-          removeBtn.textContent = "❌";
-          removeBtn.onclick = function () {
-            playlist.songs.splice(index, 1);
-            savePlaylist(currentPlaylist, playlist.songs);
-            updatePlaylistUI();
-          };
-          li.appendChild(removeBtn);
-          userPlaylist.appendChild(li);
-        });
-        enableDragAndDrop();
-      }
-    };
-  }
-  
-  function enableDragAndDrop() {
-    const items = document.querySelectorAll(".user-playlist li");
-    items.forEach((item) => {
-      item.addEventListener("dragstart", dragStart);
-      item.addEventListener("dragover", dragOver);
-      item.addEventListener("drop", dropItem);
-      item.addEventListener("dragend", dragEnd);
-    });
-  }
-  
-  let draggedItem = null;
-  function dragStart(e) {
-    draggedItem = this;
-    e.dataTransfer.effectAllowed = "move";
-    e.dataTransfer.setData("text", this.innerHTML);
-    this.classList.add("dragging");
-  }
-  function dragOver(e) {
-    e.preventDefault();
-  }
-  function dropItem(e) {
-    e.preventDefault();
-    if (draggedItem !== this) {
-      let tempSrc = this.getAttribute("data-src");
-      let tempText = this.textContent;
-      this.setAttribute("data-src", draggedItem.getAttribute("data-src"));
-      this.textContent = draggedItem.textContent;
-      draggedItem.setAttribute("data-src", tempSrc);
-      draggedItem.textContent = tempText;
     }
-  }
-  function dragEnd() {
-    this.classList.remove("dragging");
-  }
-  
-  // Adding songs from Available Songs to the selected playlist
-  document.querySelectorAll(".add-to-playlist").forEach((button) => {
-    button.addEventListener("click", function () {
-      const songElement = button.parentElement;
-      const songName = songElement.textContent.replace("➕", "").trim();
-      const songSrc = songElement.getAttribute("data-src");
-      const currentPlaylist = playlistSelector.value;
-      if (!currentPlaylist) {
-        alert("Please select a playlist first!");
-        return;
-      }
-      const transaction = db.transaction(["playlists"], "readwrite");
-      const store = transaction.objectStore("playlists");
-      const getRequest = store.get(currentPlaylist);
-      getRequest.onsuccess = function (e) {
-        let playlist = e.target.result;
-        if (!playlist) {
-          playlist = { name: currentPlaylist, songs: [] };
-        }
-        if (!playlist.songs.some((song) => song.src === songSrc)) {
-          playlist.songs.push({ name: songName, src: songSrc });
-          store.put(playlist);
-          updatePlaylistUI();
-        }
-      };
+
+    // Update now playing info (dummy info for demo)
+    function updateNowPlaying(text) {
+      trackTitle.textContent = text.trim();
+      trackInfo.textContent = "Artist Name - Album Title";
+    }
+
+    // Update playlist UI active state
+    function updatePlaylistUI() {
+      playlist.forEach((item, idx) => {
+        item.classList.toggle("active", idx === currentIndex);
+      });
+    }
+
+    // Control buttons
+    playBtn.addEventListener("click", () => {
+      if (!audio.src) playSong(currentIndex);
+      else audio.play();
+      playBtn.style.display = "none";
+      pauseBtn.style.display = "inline-block";
     });
-  });
-  
-  // Create Playlist
-  document.getElementById("create-playlist").addEventListener("click", function () {
-    const name = playlistNameInput.value.trim();
-    if (!name) return alert("Enter a playlist name!");
-    const transaction = db.transaction(["playlists"], "readwrite");
-    const store = transaction.objectStore("playlists");
-    const getRequest = store.get(name);
-    getRequest.onsuccess = function (e) {
-      if (!e.target.result) {
-        store.put({ name, songs: [] });
-        playlistNameInput.value = "";
-        loadPlaylists();
+
+    pauseBtn.addEventListener("click", () => {
+      audio.pause();
+      pauseBtn.style.display = "none";
+      playBtn.style.display = "inline-block";
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (isShuffle) currentIndex = Math.floor(Math.random() * playlist.length);
+      else currentIndex = (currentIndex + 1) % playlist.length;
+      playSong(currentIndex);
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (isShuffle) currentIndex = Math.floor(Math.random() * playlist.length);
+      else currentIndex = (currentIndex - 1 + playlist.length) % playlist.length;
+      playSong(currentIndex);
+    });
+
+    // Loop button logic
+    loopBtn.addEventListener("click", () => {
+      loopState = (loopState + 1) % 3;
+      if (loopState === 0) loopBtn.textContent = "Loop Off";
+      else if (loopState === 1) loopBtn.textContent = "Repeat One";
+      else if (loopState === 2) loopBtn.textContent = "Repeat All";
+    });
+
+    // Shuffle toggle
+    shuffleBtn.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
+    });
+
+    // Volume & Mute
+    volumeSlider.addEventListener("input", () => {
+      audio.volume = volumeSlider.value;
+      if (audio.volume > 0) {
+        muted = false;
+        muteBtn.textContent = "Mute";
+      }
+    });
+    muteBtn.addEventListener("click", () => {
+      muted = !muted;
+      audio.muted = muted;
+      muteBtn.textContent = muted ? "Unmute" : "Mute";
+    });
+
+    // Playback speed
+    speedSlider.addEventListener("input", () => {
+      audio.playbackRate = speedSlider.value;
+    });
+
+    // Seek bar update
+    audio.addEventListener("timeupdate", () => {
+      const percent = (audio.currentTime / audio.duration) * 100;
+      progressBar.style.width = percent + "%";
+    });
+
+    // Clicking on seek bar
+    seekBar.addEventListener("click", (e) => {
+      const rect = seekBar.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const newTime = (clickX / seekBar.offsetWidth) * audio.duration;
+      audio.currentTime = newTime;
+    });
+
+    // Seek bar tooltip
+    seekBar.addEventListener("mousemove", (e) => {
+      const rect = seekBar.getBoundingClientRect();
+      const hoverX = e.clientX - rect.left;
+      const time = (hoverX / seekBar.offsetWidth) * audio.duration;
+      seekTooltip.textContent = formatTime(time);
+      seekTooltip.style.left = hoverX + "px";
+      seekTooltip.style.display = "block";
+    });
+    seekBar.addEventListener("mouseout", () => {
+      seekTooltip.style.display = "none";
+    });
+
+    function formatTime(time) {
+      if (isNaN(time)) return "0:00";
+      const minutes = Math.floor(time / 60);
+      const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+      return `${minutes}:${seconds}`;
+    }
+
+    // Auto next track when song ends
+    audio.addEventListener("ended", () => {
+      if (loopState === 1) { // Repeat one
+        playSong(currentIndex);
+      } else if (loopState === 2) { // Repeat all
+        nextBtn.click();
       } else {
-        alert("Playlist name already exists!");
+        if (currentIndex < playlist.length - 1) nextBtn.click();
       }
-    };
-  });
-  
-  // Rename Playlist
-  document.getElementById("rename-playlist").addEventListener("click", function () {
-    const oldName = playlistSelector.value;
-    if (!oldName) return alert("Select a playlist to rename.");
-    const newName = prompt("Enter new playlist name:", oldName);
-    if (!newName || newName === oldName) return;
-    const transaction = db.transaction(["playlists"], "readwrite");
-    const store = transaction.objectStore("playlists");
-    const getRequest = store.get(oldName);
-    getRequest.onsuccess = function (e) {
-      const playlist = e.target.result;
-      if (playlist) {
-        store.delete(oldName);
-        const newTransaction = db.transaction(["playlists"], "readwrite");
-        const newStore = newTransaction.objectStore("playlists");
-        newStore.put({ name: newName, songs: playlist.songs });
-        newTransaction.oncomplete = function () {
-          loadPlaylists();
-          alert("Playlist renamed successfully!");
-        };
+    });
+
+    // Drag-and-Drop Playlist Reordering
+    let dragSrcEl = null;
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/html", this.outerHTML);
+      this.classList.add("dragging");
+    }
+    function handleDragOver(e) {
+      if (e.preventDefault) e.preventDefault();
+      this.classList.add("drag-over");
+      return false;
+    }
+    function handleDragLeave(e) {
+      this.classList.remove("drag-over");
+    }
+    function handleDrop(e) {
+      if (e.stopPropagation) e.stopPropagation();
+      if (dragSrcEl !== this) {
+        this.parentNode.removeChild(dragSrcEl);
+        const dropHTML = e.dataTransfer.getData("text/html");
+        this.insertAdjacentHTML("beforebegin", dropHTML);
+        const droppedElem = this.previousSibling;
+        addDnDHandlers(droppedElem);
+        // Update playlist order
+        playlist = Array.from(playlistEl.querySelectorAll("li"));
       }
-    };
-  });
-  
-  playlistSelector.addEventListener("change", updatePlaylistUI);
-  });
+      this.classList.remove("drag-over");
+      return false;
+    }
+    function handleDragEnd(e) {
+      this.classList.remove("dragging");
+      playlist.forEach(item => item.classList.remove("drag-over"));
+    }
+    function addDnDHandlers(elem) {
+      elem.addEventListener("dragstart", handleDragStart, false);
+      elem.addEventListener("dragover", handleDragOver, false);
+      elem.addEventListener("dragleave", handleDragLeave, false);
+      elem.addEventListener("drop", handleDrop, false);
+      elem.addEventListener("dragend", handleDragEnd, false);
+    }
+    playlist.forEach(item => {
+      addDnDHandlers(item);
+      item.addEventListener("click", () => {
+        // Clicking on playlist item plays that song
+        const idx = playlist.indexOf(item);
+        playSong(idx);
+      });
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener("keydown", (e) => {
+      switch(e.key) {
+        case " ":
+          e.preventDefault();
+          if (audio.paused) playBtn.click();
+          else pauseBtn.click();
+          break;
+        case "ArrowRight":
+          nextBtn.click();
+          break;
+        case "ArrowLeft":
+          prevBtn.click();
+          break;
+        case "ArrowUp":
+          volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+        case "ArrowDown":
+          volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
+          volumeSlider.dispatchEvent(new Event("input"));
+          break;
+      }
+    });
+
+    // Simulated Crossfade effect (simple fade-out/in)
+    audio.addEventListener("pause", () => {
+      // Simulate fade out by reducing volume gradually
+      let vol = audio.volume;
+      const fade = setInterval(() => {
+        if (vol > 0.1) {
+          vol -= 0.1;
+          audio.volume = vol;
+        } else {
+          clearInterval(fade);
+        }
+      }, 50);
+    });
   </script>
 </body>
-  </html>
+</html>
