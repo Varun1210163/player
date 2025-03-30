@@ -6,7 +6,6 @@
   <title>Ultra Advanced Vibrant Media Player</title>
   <meta name="description" content="A vibrant, advanced media player supporting all formats with smooth transitions, dynamic waveform visualization for audio, and seamless video playback.">
   <meta name="author" content="Varun Prasath">
-  <!-- Embedded CSS -->
   <style>
     /* Base Variables & Themes */
     :root {
@@ -19,7 +18,7 @@
       --text-dark: #121212;
       --border-radius: 8px;
       --transition-speed: 0.4s;
-      --shadow: 0 4px 10px rgba(0,0,0,0.5);
+      --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     }
     @keyframes bgAnimation {
       0% { background-position: 0% 50%; }
@@ -28,7 +27,7 @@
     }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #FF2D95, #2DFEFF, #FFDA2D);
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
       background-size: 200% 200%;
       animation: bgAnimation 10s ease infinite;
       color: var(--text-light);
@@ -63,11 +62,11 @@
       font-size: 2rem;
       margin: 0;
     }
-    .container {
+    main {
       width: 90%;
       max-width: 1200px;
       margin: 2rem auto;
-      background: rgba(0,0,0,0.75);
+      background: rgba(0, 0, 0, 0.75);
       padding: 1.5rem;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
@@ -79,9 +78,6 @@
       gap: 1rem;
       margin-bottom: 1rem;
     }
-    .track-info {
-      flex-grow: 1;
-    }
     .track-info h2 {
       font-size: 1.5rem;
       margin: 0 0 0.3rem 0;
@@ -91,17 +87,17 @@
       opacity: 0.8;
       margin: 0;
     }
-    /* Display Container: for video content or audio waveform */
+    /* Display Container: holds video or audio visualization */
     #display-container {
       position: relative;
       width: 100%;
-      height: 150px; /* Compact height */
+      height: 150px;
       background: #000;
       border-radius: var(--border-radius);
       overflow: hidden;
       margin-bottom: 1rem;
     }
-    /* Both media elements inside the display container take full size */
+    /* Both media elements take full size */
     #audio-visualizer,
     #video-player {
       width: 100%;
@@ -111,7 +107,7 @@
       left: 0;
       transition: opacity var(--transition-speed);
     }
-    /* Hide an element when not in use */
+    /* Hide elements when not used */
     .hidden {
       display: none;
     }
@@ -135,7 +131,7 @@
     .seek-tooltip {
       position: absolute;
       top: -25px;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0, 0, 0, 0.8);
       padding: 2px 5px;
       border-radius: 4px;
       font-size: 0.8rem;
@@ -180,10 +176,9 @@
     }
     .playlist li {
       padding: 0.5rem;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       cursor: pointer;
     }
-    /* Mobile-specific adjustments */
     @media (max-width: 480px) {
       #display-container {
         height: 120px;
@@ -195,26 +190,28 @@
   <header>
     <h1>Ultra Advanced Vibrant Media Player</h1>
   </header>
-  <div class="container">
+  <main>
     <!-- Now Playing Display -->
-    <div class="now-playing">
+    <section class="now-playing" aria-label="Now Playing">
       <div class="track-info">
         <h2 id="track-title">Track Title</h2>
         <p id="track-meta">Artist - Album</p>
       </div>
-    </div>
-    <!-- Display Container: Shows the video content or audio waveform -->
-    <div id="display-container">
-      <canvas id="audio-visualizer" class="hidden"></canvas>
+    </section>
+    <!-- Display Container: holds video or audio visualization -->
+    <section id="display-container" aria-label="Media Display">
+      <!-- Audio visualization canvas -->
+      <canvas id="audio-visualizer" class="hidden" aria-hidden="true"></canvas>
+      <!-- Video element for video playback -->
       <video id="video-player" playsinline aria-label="Media Player" class="hidden"></video>
-    </div>
+    </section>
     <!-- Seek Bar -->
-    <div class="seek-bar" id="seek-bar" aria-label="Seek Bar">
+    <div class="seek-bar" id="seek-bar" role="slider" aria-label="Seek Bar">
       <div class="progress" id="progress"></div>
-      <div class="seek-tooltip" id="seek-tooltip">0:00</div>
+      <div class="seek-tooltip" id="seek-tooltip" aria-live="off">0:00</div>
     </div>
     <!-- Playback Controls -->
-    <div class="controls">
+    <section class="controls" aria-label="Playback Controls">
       <button id="prev" aria-label="Previous Track">⏮️</button>
       <button id="play" aria-label="Play">▶️</button>
       <button id="pause" aria-label="Pause" style="display:none;">⏸️</button>
@@ -228,18 +225,19 @@
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
         <button id="mute" aria-label="Mute/Unmute">Mute</button>
       </div>
-    </div>
+    </section>
     <!-- Playlist -->
-    <div class="playlist">
+    <section class="playlist" aria-label="Playlist">
       <ul id="playlistItems"></ul>
-    </div>
-  </div>
-        
-  <!-- Embedded JavaScript -->
+    </section>
+    <!-- Hidden audio element for audio playback -->
+    <audio id="audio-player" class="hidden"></audio>
+  </main>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       /* ===== DOM Elements ===== */
       const videoPlayer = document.getElementById("video-player");
+      const audioPlayer = document.getElementById("audio-player");
       const audioCanvas = document.getElementById("audio-visualizer");
       const displayContainer = document.getElementById("display-container");
       const ctx = audioCanvas.getContext("2d");
@@ -259,23 +257,23 @@
       const trackTitle = document.getElementById("track-title");
       const trackMeta = document.getElementById("track-meta");
       const playlistEl = document.getElementById("playlistItems");
-          
+
       /* ===== Player State ===== */
       let currentIndex = 0;
       let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
       let isShuffle = false;
       let muted = false;
       let playlist = [];
-      // Hold current media type: "audio" or "video"
+      // Track current media type: "audio" or "video"
       let currentMediaType = null;
-          
+
       /* ===== Predefined Songs List ===== */
       const songs = [
         { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", meta: "Artist - Album" },
         { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", meta: "Artist - Album" },
         { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", meta: "Video Title" }
       ];
-          
+
       /* ===== Playlist Population ===== */
       function populatePlaylist() {
         playlistEl.innerHTML = "";
@@ -287,11 +285,13 @@
           const li = document.createElement("li");
           li.textContent = song.title;
           li.dataset.index = i;
+          li.tabIndex = 0;
           li.addEventListener("click", () => playMedia(i));
+          li.addEventListener("keypress", (e) => { if (e.key === "Enter") playMedia(i); });
           playlistEl.appendChild(li);
         });
       }
-          
+
       /* ===== Auto-Save & Load Playlist ===== */
       window.addEventListener("load", () => {
         const savedIndex = localStorage.getItem("lastIndex");
@@ -304,22 +304,23 @@
         }
         populatePlaylist();
         if (savedIndex !== null && songs[savedIndex]) {
-          currentIndex = parseInt(savedIndex);
+          currentIndex = parseInt(savedIndex, 10);
         }
         playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
       });
       window.addEventListener("beforeunload", () => {
+        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
         localStorage.setItem("lastIndex", currentIndex);
-        localStorage.setItem("lastTime", videoPlayer.currentTime);
+        localStorage.setItem("lastTime", activePlayer.currentTime);
         localStorage.setItem("playlistOrder", JSON.stringify(playlist));
       });
-          
+
       /* ===== Web Audio API Setup for Audio Visualization ===== */
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       let sourceNode, analyser;
       function setupAudioAnalyser() {
         if (!sourceNode) {
-          sourceNode = audioCtx.createMediaElementSource(videoPlayer);
+          sourceNode = audioCtx.createMediaElementSource(audioPlayer);
           analyser = audioCtx.createAnalyser();
           analyser.fftSize = 256;
           sourceNode.connect(analyser);
@@ -327,7 +328,7 @@
         }
       }
       setupAudioAnalyser();
-          
+
       /* ===== Visualizer: Waveform for Audio ===== */
       function drawWaveform() {
         if (!analyser) return;
@@ -358,15 +359,15 @@
         }
       }
       animateVisualizer();
-          
+
       function resizeCanvas() {
-        audioCanvas.width = audioCanvas.clientWidth;
-        audioCanvas.height = audioCanvas.clientHeight;
+        audioCanvas.width = audioCanvas.clientWidth || 300;
+        audioCanvas.height = audioCanvas.clientHeight || 150;
       }
       window.addEventListener("resize", resizeCanvas);
       window.addEventListener("orientationchange", resizeCanvas);
       resizeCanvas();
-          
+
       /* ===== Determine Media Type Based on File Extension ===== */
       function getMediaTypeForSource(src) {
         const extension = src.split('.').pop().toLowerCase();
@@ -374,9 +375,9 @@
         const audioExtensions = ["mp3", "flac", "wav", "aac"];
         if (videoExtensions.includes(extension)) return "video";
         else if (audioExtensions.includes(extension)) return "audio";
-        else return "audio"; // default fallback
+        else return "audio";
       }
-          
+
       /* ===== Media Playback Functions ===== */
       function playMedia(index, startTime = 0) {
         currentIndex = index;
@@ -385,155 +386,163 @@
         trackMeta.textContent = song.meta;
         const type = getMediaTypeForSource(song.src);
         currentMediaType = type;
-        
-        // Toggle display elements based on media type.
+
+        // Stop both players
+        audioPlayer.pause();
+        videoPlayer.pause();
+
+        // Show/hide appropriate elements
         if (type === "audio") {
-          // Show the canvas (waveform) and hide the video element.
-          audioCanvas.classList.remove("hidden");
+          audioPlayer.classList.remove("hidden");
           videoPlayer.classList.add("hidden");
+          audioCanvas.classList.remove("hidden");
+          // Load audio source into dedicated audio element
+          audioPlayer.src = song.src;
+          audioPlayer.load();
+          audioPlayer.currentTime = startTime;
+          audioPlayer.play();
         } else if (type === "video") {
-          // Show the video element and hide the canvas.
           videoPlayer.classList.remove("hidden");
+          audioPlayer.classList.add("hidden");
           audioCanvas.classList.add("hidden");
+          videoPlayer.src = song.src;
+          videoPlayer.load();
+          videoPlayer.currentTime = startTime;
+          videoPlayer.play();
         }
-        
-        // Load and play the media.
-        videoPlayer.src = song.src;
-        videoPlayer.load();
-        videoPlayer.currentTime = startTime;
-        videoPlayer.play();
+        playBtn.style.display = "none";
+        pauseBtn.style.display = "inline-block";
       }
-          
+
       /* ===== Standard Controls ===== */
       playBtn.addEventListener("click", () => {
-        if (!videoPlayer.src) playMedia(currentIndex);
-        else videoPlayer.play();
+        if (currentMediaType === "audio") {
+          if (!audioPlayer.src) playMedia(currentIndex);
+          else audioPlayer.play();
+        } else {
+          if (!videoPlayer.src) playMedia(currentIndex);
+          else videoPlayer.play();
+        }
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
       });
-          
       pauseBtn.addEventListener("click", () => {
-        videoPlayer.pause();
+        if (currentMediaType === "audio") {
+          audioPlayer.pause();
+        } else {
+          videoPlayer.pause();
+        }
         pauseBtn.style.display = "none";
         playBtn.style.display = "inline-block";
       });
-          
       nextBtn.addEventListener("click", () => {
         if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
         else currentIndex = (currentIndex + 1) % songs.length;
         playMedia(currentIndex);
       });
-          
       prevBtn.addEventListener("click", () => {
         if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
         else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
         playMedia(currentIndex);
       });
-          
       loopBtn.addEventListener("click", () => {
         loopState = (loopState + 1) % 3;
         loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
       });
-          
       shuffleBtn.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
       });
-          
       fullscreenBtn.addEventListener("click", () => {
-        if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
-        else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
+        // For video, request fullscreen on the video element; for audio, use the display container
+        if (currentMediaType === "video") {
+          if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
+          else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
+        } else if (currentMediaType === "audio") {
+          if (displayContainer.requestFullscreen) displayContainer.requestFullscreen();
+          else if (displayContainer.webkitRequestFullscreen) displayContainer.webkitRequestFullscreen();
+        }
       });
-          
       themeToggleBtn.addEventListener("click", () => {
         document.body.classList.toggle("dark");
         document.body.classList.toggle("light");
       });
-          
       volumeSlider.addEventListener("input", () => {
-        videoPlayer.volume = volumeSlider.value;
-        if (videoPlayer.volume > 0) {
-          muted = false;
-          muteBtn.textContent = "Mute";
+        if (currentMediaType === "audio") {
+          audioPlayer.volume = volumeSlider.value;
+          if (audioPlayer.volume > 0) {
+            muted = false;
+            muteBtn.textContent = "Mute";
+          }
+        } else {
+          videoPlayer.volume = volumeSlider.value;
+          if (videoPlayer.volume > 0) {
+            muted = false;
+            muteBtn.textContent = "Mute";
+          }
         }
       });
-          
       muteBtn.addEventListener("click", () => {
         muted = !muted;
-        videoPlayer.muted = muted;
+        if (currentMediaType === "audio") {
+          audioPlayer.muted = muted;
+        } else {
+          videoPlayer.muted = muted;
+        }
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       });
-          
-      videoPlayer.addEventListener("timeupdate", () => {
-        if (videoPlayer.duration) {
-          const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+      // Update progress bar for active media
+      function updateProgress() {
+        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        if (activePlayer.duration) {
+          const percent = (activePlayer.currentTime / activePlayer.duration) * 100;
           progressBar.style.width = percent + "%";
         }
-      });
-          
+      }
+      audioPlayer.addEventListener("timeupdate", updateProgress);
+      videoPlayer.addEventListener("timeupdate", updateProgress);
       seekBar.addEventListener("click", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
-        const newTime = (clickX / seekBar.offsetWidth) * videoPlayer.duration;
-        videoPlayer.currentTime = newTime;
+        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        const newTime = (clickX / seekBar.offsetWidth) * activePlayer.duration;
+        activePlayer.currentTime = newTime;
       });
-          
       seekBar.addEventListener("mousemove", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const hoverX = e.clientX - rect.left;
-        const time = (hoverX / seekBar.offsetWidth) * videoPlayer.duration;
+        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        const time = (hoverX / seekBar.offsetWidth) * activePlayer.duration;
         seekTooltip.textContent = formatTime(time);
         seekTooltip.style.left = hoverX + "px";
         seekTooltip.style.display = "block";
       });
-          
       seekBar.addEventListener("mouseout", () => {
         seekTooltip.style.display = "none";
       });
-          
       function formatTime(time) {
         if (isNaN(time)) return "0:00";
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60).toString().padStart(2, "0");
         return `${minutes}:${seconds}`;
       }
-          
-      videoPlayer.addEventListener("ended", () => {
+      // Handle media end events
+      function handleMediaEnd() {
         if (loopState === 1) {
           playMedia(currentIndex);
         } else {
           nextBtn.click();
         }
-      });
-          
+      }
+      audioPlayer.addEventListener("ended", handleMediaEnd);
+      videoPlayer.addEventListener("ended", handleMediaEnd);
+      // Keyboard controls
       document.addEventListener("keydown", (e) => {
-        switch(e.key) {
+        switch (e.key) {
           case " ":
             e.preventDefault();
-            if (videoPlayer.paused) playBtn.click();
-            else pauseBtn.click();
+            currentMediaType === "audio" ? (audioPlayer.paused ? playBtn.click() : pauseBtn.click())
+                                         : (videoPlayer.paused ? playBtn.click() : pauseBtn.click());
             break;
           case "ArrowRight":
-            nextBtn.click();
-            break;
-          case "ArrowLeft":
-            prevBtn.click();
-            break;
-          case "ArrowUp":
-            volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
-            volumeSlider.dispatchEvent(new Event("input"));
-            break;
-          case "ArrowDown":
-            volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
-            volumeSlider.dispatchEvent(new Event("input"));
-            break;
-        }
-      });
-          
-      document.body.addEventListener("click", () => {
-        if (audioCtx.state === "suspended") audioCtx.resume();
-      });
-    });
-  </script>
-</body>
-</html>
+  
