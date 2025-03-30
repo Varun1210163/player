@@ -41,7 +41,7 @@
       transition: background 0.5s;
     }
     /* Theme classes */
-    body.dark { 
+    body.dark {   
       background: linear-gradient(135deg, #121212, #2D2D2D, #121212);
     }
     body.neon {
@@ -248,10 +248,10 @@
     <div class="search-container">
       <input type="text" id="songSearch" placeholder="Search Songs...">
     </div>
-    <!-- Search Results -->
+    <!-- Search Results / Playlist -->
     <ul class="search-results" id="searchResults"></ul>
   </div>
-
+  
   <!-- Embedded JavaScript -->
   <script>
     /* ===== DOM Elements ===== */
@@ -277,21 +277,21 @@
     const ctx = visualizer.getContext("2d");
     const songSearchInput = document.getElementById("songSearch");
     const searchResultsEl = document.getElementById("searchResults");
-
+  
     /* ===== Player State ===== */
     let currentIndex = 0;
     let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
     let isShuffle = false;
     let muted = false;
-
+  
     /* ===== Predefined Songs List ===== */
     const songs = [
       { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", type: "audio" },
-      { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song2.mp3", type: "audio" },
+      { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", type: "audio" },
       { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" }
       // Add more songs as needed.
     ];
-
+  
     /* ===== Auto-Save & Load Last Position ===== */
     window.addEventListener("load", () => {
       const savedIndex = localStorage.getItem("lastIndex");
@@ -300,12 +300,14 @@
         currentIndex = parseInt(savedIndex);
       }
       playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
+      // Display the full songs list as default.
+      displaySearchResults(songs);
     });
     window.addEventListener("beforeunload", () => {
       localStorage.setItem("lastIndex", currentIndex);
       localStorage.setItem("lastTime", mediaPlayer.currentTime);
     });
-
+  
     /* ===== Web Audio API Setup (Visualizer & Equalizer) ===== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const sourceNode = audioCtx.createMediaElementSource(mediaPlayer);
@@ -329,7 +331,7 @@
     midFilter.connect(trebleFilter);
     trebleFilter.connect(analyser);
     analyser.connect(audioCtx.destination);
-
+  
     /* ===== Visualizer ===== */
     function drawVisualizer() {
       requestAnimationFrame(drawVisualizer);
@@ -352,7 +354,7 @@
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
-
+  
     /* ===== Theme Toggle ===== */
     let themeState = 0; // 0: dark (default), 1: neon, 2: light
     themeToggleBtn.addEventListener("click", () => {
@@ -362,7 +364,7 @@
       else if (themeState === 1) document.body.classList.add("neon");
       else if (themeState === 2) document.body.classList.add("light");
     });
-
+  
     /* ===== Media Playback Functions ===== */
     function playMedia(index, startTime = 0) {
       currentIndex = index;
@@ -382,7 +384,7 @@
       trackTitle.textContent = title;
       trackMeta.textContent = type === "audio" ? "Artist - Album" : "Video Title";
     }
-
+  
     /* ===== Standard Controls ===== */
     playBtn.addEventListener("click", () => {
       if (!mediaPlayer.src) playMedia(currentIndex);
@@ -423,7 +425,7 @@
       // If you had a separate playlist management page, navigate to it.
       alert("Playlist management is disabled in this version. Use the search to play songs.");
     });
-
+  
     /* ===== Volume & Mute ===== */
     volumeSlider.addEventListener("input", () => {
       mediaPlayer.volume = volumeSlider.value;
@@ -437,7 +439,7 @@
       mediaPlayer.muted = muted;
       muteBtn.textContent = muted ? "Unmute" : "Mute";
     });
-
+  
     /* ===== Seek Bar & Tooltip ===== */
     mediaPlayer.addEventListener("timeupdate", () => {
       const percent = (mediaPlayer.currentTime / mediaPlayer.duration) * 100;
@@ -466,10 +468,7 @@
       const seconds = Math.floor(time % 60).toString().padStart(2, "0");
       return `${minutes}:${seconds}`;
     }
-
-    /* ===== Remove Unwanted Advanced Controls ===== */
-    // Pitch, Tempo, and A-B repeat functionalities have been removed.
-
+  
     /* ===== Keyboard Shortcuts ===== */
     document.addEventListener("keydown", (e) => {
       switch(e.key) {
@@ -494,12 +493,12 @@
           break;
       }
     });
-
+  
     /* ===== Resume AudioContext on Interaction ===== */
     document.body.addEventListener("click", () => {
       if (audioCtx.state === "suspended") audioCtx.resume();
     });
-
+  
     /* ===== Song Search Functionality ===== */
     // Display search results based on query
     function displaySearchResults(results) {
@@ -523,7 +522,8 @@
     songSearchInput.addEventListener("input", () => {
       const query = songSearchInput.value.toLowerCase();
       if (query === "") {
-        searchResultsEl.innerHTML = "";
+        // If the query is empty, display all songs again.
+        displaySearchResults(songs);
         return;
       }
       const results = songs.filter(song => song.title.toLowerCase().includes(query));
