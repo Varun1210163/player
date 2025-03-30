@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -91,7 +92,23 @@
       opacity: 0.8;
       margin: 0;
     }
-    /* Media Container: Holds Video & Audio Visualizer */
+    /* Audio Visualizer Container */
+    #audio-container {
+      width: 100%;
+      max-height: 300px;
+      background: var(--bg-dark);
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      display: none; /* hidden by default */
+    }
+    #audio-visualizer {
+      width: 100%;
+      height: 100%;
+      display: block;
+      transition: opacity var(--transition-speed);
+    }
+    /* Video Media Container */
     #media-container {
       position: relative;
       width: 100%;
@@ -99,8 +116,8 @@
       background: #000;
       border-radius: var(--border-radius);
       overflow: hidden;
+      display: none; /* hidden by default */
     }
-    /* Video Element (used for video playback) */
     #video-player {
       width: 100%;
       height: auto;
@@ -109,22 +126,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      /* Ensuring the video is on top when visible */
       z-index: 2;
-    }
-    /* Audio Visualizer Canvas */
-    #audio-visualizer {
-      width: 100%;
-      height: 100%;
-      display: block;
-      transition: opacity var(--transition-speed);
-      position: absolute;
-      top: 0;
-      left: 0;
-      background: var(--bg-dark);
-      border-radius: var(--border-radius);
-      /* Placed behind the video element if needed */
-      z-index: 1;
     }
     /* Seek Bar */
     .seek-bar {
@@ -199,8 +201,8 @@
       #media-container {
         max-height: 300px;
       }
-      #audio-visualizer, #video-player {
-        height: 100%;
+      #audio-container {
+        max-height: 200px;
       }
     }
   </style>
@@ -217,12 +219,13 @@
         <p id="track-meta">Artist - Album</p>
       </div>
     </div>
-    <!-- Media Container -->
-    <div id="media-container">
-      <!-- Video Element for video tracks -->
-      <video id="video-player" playsinline aria-label="Media Player"></video>
-      <!-- Canvas for audio waveform visualization -->
+    <!-- Audio Visualizer Container (placed above the video player) -->
+    <div id="audio-container">
       <canvas id="audio-visualizer"></canvas>
+    </div>
+    <!-- Video Media Container -->
+    <div id="media-container">
+      <video id="video-player" playsinline aria-label="Media Player"></video>
     </div>
     <!-- Seek Bar -->
     <div class="seek-bar" id="seek-bar" aria-label="Seek Bar">
@@ -257,6 +260,8 @@
       /* ===== DOM Elements ===== */
       const videoPlayer = document.getElementById("video-player");
       const audioCanvas = document.getElementById("audio-visualizer");
+      const audioContainer = document.getElementById("audio-container");
+      const mediaContainer = document.getElementById("media-container");
       const ctx = audioCanvas.getContext("2d");
       const playBtn = document.getElementById("play");
       const pauseBtn = document.getElementById("pause");
@@ -406,16 +411,16 @@
         
         // Toggle display based on media type:
         if (type === "audio") {
-          // Show the waveform canvas and hide the video element.
-          audioCanvas.style.display = "block";
-          videoPlayer.style.display = "none";
+          // Show the audio container (with the waveform) and hide the video container.
+          audioContainer.style.display = "block";
+          mediaContainer.style.display = "none";
         } else if (type === "video") {
-          // Hide the waveform canvas and show the video element.
-          audioCanvas.style.display = "none";
-          videoPlayer.style.display = "block";
+          // Hide the audio container and show the video container.
+          audioContainer.style.display = "none";
+          mediaContainer.style.display = "block";
         }
         
-        // Load and play the media
+        // Load and play the media.
         videoPlayer.src = song.src;
         videoPlayer.load();
         videoPlayer.currentTime = startTime;
