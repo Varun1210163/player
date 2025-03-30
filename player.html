@@ -178,18 +178,7 @@
       align-items: center;  
       gap: 0.5rem;  
     }  
-    /* Search & Playlist */  
-    .search-container {  
-      text-align: center;  
-      margin-bottom: 1rem;  
-    }  
-    .search-container input[type="text"] {  
-      padding: 0.5rem;  
-      width: 80%;  
-      max-width: 300px;  
-      border: none;  
-      border-radius: var(--border-radius);  
-    }  
+    /* Playlist */  
     .playlist {  
       margin-top: 1rem;  
     }  
@@ -245,10 +234,7 @@
         <button id="mute" aria-label="Mute/Unmute">Mute</button>  
       </div>  
     </div>  
-    <!-- Search & Playlist -->  
-    <div class="search-container">  
-      <input type="text" id="songSearch" placeholder="Search Songs..." aria-label="Search Songs">  
-    </div>  
+    <!-- Playlist -->  
     <div class="playlist">  
       <ul id="playlistItems"></ul>  
     </div>  
@@ -276,7 +262,6 @@
       const seekTooltip = document.getElementById("seek-tooltip");  
       const trackTitle = document.getElementById("track-title");  
       const trackMeta = document.getElementById("track-meta");  
-      const songSearchInput = document.getElementById("songSearch");  
       const playlistEl = document.getElementById("playlistItems");  
       
       /* ===== Player State ===== */  
@@ -298,7 +283,7 @@
       /* ===== Playlist Population ===== */  
       function populatePlaylist() {  
         playlistEl.innerHTML = "";  
-        // If playlist is empty (or not saved), use default order  
+        // If no saved playlist order, use default order  
         if (playlist.length === 0) {  
           playlist = songs.map((s, i) => i);  
         }  
@@ -327,8 +312,6 @@
           currentIndex = parseInt(savedIndex);  
         }  
         playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);  
-        // Show full list on load  
-        displaySearchResults(songs);  
       });  
       window.addEventListener("beforeunload", () => {  
         localStorage.setItem("lastIndex", currentIndex);  
@@ -413,32 +396,6 @@
         trackTitle.textContent = song.title;  
         trackMeta.textContent = song.meta;  
       }  
-      
-      /* ===== Search & Playlist Display ===== */  
-      function displaySearchResults(results) {  
-        playlistEl.innerHTML = "";  
-        results.forEach((song, idx) => {  
-          const li = document.createElement("li");  
-          li.textContent = song.title;  
-          li.dataset.index = idx;  
-          li.addEventListener("click", () => {  
-            // Find the actual index of the song in the songs array  
-            const songIndex = songs.findIndex(s => s.src === song.src);  
-            if (songIndex !== -1) playMedia(songIndex);  
-          });  
-          playlistEl.appendChild(li);  
-        });  
-      }  
-      
-      songSearchInput.addEventListener("input", () => {  
-        const query = songSearchInput.value.toLowerCase();  
-        if (query === "") {  
-          displaySearchResults(songs);  
-          return;  
-        }  
-        const results = songs.filter(song => song.title.toLowerCase().includes(query));  
-        displaySearchResults(results);  
-      });  
       
       /* ===== Standard Controls ===== */  
       playBtn.addEventListener("click", () => {  
@@ -558,4 +515,22 @@
           case "ArrowLeft":  
             prevBtn.click();  
             break;  
-          ca
+          case "ArrowUp":  
+            volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);  
+            volumeSlider.dispatchEvent(new Event("input"));  
+            break;  
+          case "ArrowDown":  
+            volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);  
+            volumeSlider.dispatchEvent(new Event("input"));  
+            break;  
+        }  
+      });  
+      
+      /* ===== Resume AudioContext on Interaction ===== */  
+      document.body.addEventListener("click", () => {  
+        if (audioCtx.state === "suspended") audioCtx.resume();  
+      });  
+    });  
+  </script>  
+</body>  
+</html>
