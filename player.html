@@ -4,22 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultra Advanced Vibrant Media Player</title>
-  <meta name="description" content="A vibrant, ultra-advanced multimedia player with advanced controls, a dynamic visualizer, and a built-in song search.">
+  <meta name="description" content="A vibrant, advanced media player supporting all formats with smooth transitions, dynamic waveform visualization for audio, and seamless video playback.">
   <meta name="author" content="Varun Prasath">
   <!-- Embedded CSS -->
   <style>
-    /* Base & Vibrant Theme & Animated Background */
+    /* Base Variables & Themes */
     :root {
       --primary-color: #FF2D95;
       --secondary-color: #2DFEFF;
       --accent-color: #FFDA2D;
       --bg-dark: #121212;
       --bg-light: #f0f0f0;
-      --bg-neon: #0d0d0d;
       --text-light: #ffffff;
       --text-dark: #121212;
       --border-radius: 8px;
-      --transition-speed: 0.3s;
+      --transition-speed: 0.4s;
       --shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
     @keyframes bgAnimation {
@@ -33,20 +32,18 @@
       background-size: 200% 200%;
       animation: bgAnimation 10s ease infinite;
       color: var(--text-light);
+      margin: 0;
+      padding: 0;
       overflow-x: hidden;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: background 0.5s;
+      transition: background var(--transition-speed), color var(--transition-speed);
     }
-    /* Theme classes */
-    body.dark {   
+    /* Theme Classes */
+    body.dark {
       background: linear-gradient(135deg, #121212, #2D2D2D, #121212);
-    }
-    body.neon {
-      background: linear-gradient(135deg, #0d0d0d, #0a0a0a, #0d0d0d);
-      color: var(--accent-color);
     }
     body.light {
       background: var(--bg-light);
@@ -60,21 +57,22 @@
       box-shadow: var(--shadow);
       position: sticky;
       top: 0;
-      z-index: 100;
+      z-index: 200;
     }
     header h1 {
       font-size: 2rem;
+      margin: 0;
     }
     .container {
       width: 90%;
-      max-width: 1000px;
+      max-width: 1200px;
       margin: 2rem auto;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.75);
       padding: 1.5rem;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
     }
-    /* Now Playing Display with Album Art */
+    /* Now Playing Display */
     .now-playing {
       display: flex;
       align-items: center;
@@ -93,26 +91,45 @@
     }
     .track-info h2 {
       font-size: 1.5rem;
-      margin-bottom: 0.3rem;
+      margin: 0 0 0.3rem 0;
     }
     .track-info p {
       font-size: 1rem;
       opacity: 0.8;
+      margin: 0;
     }
-    /* Media Player (Audio/Video) */
-    #media-player {
+    /* Media Container: Holds Video & Audio Visualizer */
+    #media-container {
+      position: relative;
       width: 100%;
       max-height: 450px;
       background: #000;
       border-radius: var(--border-radius);
+      overflow: hidden;
     }
-    /* Visualizer */
-    canvas {
+    /* Video Element (used for both audio & video playback) */
+    #video-player {
       width: 100%;
-      height: 200px;
+      height: auto;
+      display: block;
+      opacity: 0;
+      transition: opacity var(--transition-speed);
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    /* Audio Visualizer Canvas */
+    #audio-visualizer {
+      width: 100%;
+      height: 100%;
+      display: block;
+      opacity: 0;
+      transition: opacity var(--transition-speed);
+      position: absolute;
+      top: 0;
+      left: 0;
       background: var(--bg-dark);
       border-radius: var(--border-radius);
-      margin: 1rem 0;
     }
     /* Seek Bar */
     .seek-bar {
@@ -141,7 +158,7 @@
       display: none;
       white-space: nowrap;
     }
-    /* Controls */
+    /* Playback Controls */
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -163,15 +180,12 @@
     .controls input[type="range"]:hover {
       background: var(--accent-color);
     }
-    .controls .active {
-      background: var(--accent-color);
-    }
     .slider-container {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-    /* Search Functionality */
+    /* Search & Playlist */
     .search-container {
       text-align: center;
       margin-bottom: 1rem;
@@ -183,34 +197,27 @@
       border: none;
       border-radius: var(--border-radius);
     }
-    /* Search Results */
-    .search-results {
-      list-style: none;
-      max-height: 200px;
-      overflow-y: auto;
-      margin: 0 auto 1rem;
-      padding: 0.5rem;
-      background: rgba(255,255,255,0.05);
-      border-radius: var(--border-radius);
-      width: 90%;
-      max-width: 500px;
+    .playlist {
+      margin-top: 1rem;
     }
-    .search-results li {
+    .playlist ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .playlist li {
       padding: 0.5rem;
       border-bottom: 1px solid rgba(255,255,255,0.1);
       cursor: pointer;
     }
-    .search-results li:last-child {
-      border-bottom: none;
-    }
   </style>
 </head>
-<body>
+<body class="dark">
   <header>
     <h1>Ultra Advanced Vibrant Media Player</h1>
   </header>
   <div class="container">
-    <!-- Now Playing Display with Album Art -->
+    <!-- Now Playing Display -->
     <div class="now-playing">
       <img src="https://via.placeholder.com/80x80.png?text=Art" alt="Album Art" class="album-art" id="album-art">
       <div class="track-info">
@@ -218,43 +225,50 @@
         <p id="track-meta">Artist - Album</p>
       </div>
     </div>
-    <!-- Media Element (Audio/Video) -->
-    <video id="media-player" playsinline></video>
-    <!-- Visualizer -->
-    <canvas id="visualizer"></canvas>
+    <!-- Media Container -->
+    <div id="media-container">
+      <!-- Video Element for video tracks and audio playback -->
+      <video id="video-player" playsinline aria-label="Media Player"></video>
+      <!-- Canvas for audio waveform visualization -->
+      <canvas id="audio-visualizer"></canvas>
+    </div>
     <!-- Seek Bar -->
-    <div class="seek-bar" id="seek-bar">
+    <div class="seek-bar" id="seek-bar" aria-label="Seek Bar">
       <div class="progress" id="progress"></div>
       <div class="seek-tooltip" id="seek-tooltip">0:00</div>
     </div>
-    <!-- Standard Playback Controls -->
+    <!-- Playback Controls -->
     <div class="controls">
-      <button id="prev">⏮️</button>
-      <button id="play">▶️</button>
-      <button id="pause" style="display:none;">⏸️</button>
-      <button id="next">⏭️</button>
-      <button id="loop">Loop Off</button>
-      <button id="shuffle">Shuffle Off</button>
-      <button id="fullscreen">Fullscreen</button>
-      <button id="themeToggle">Toggle Theme</button>
+      <button id="prev" aria-label="Previous Track">⏮️</button>
+      <button id="play" aria-label="Play">▶️</button>
+      <button id="pause" aria-label="Pause" style="display:none;">⏸️</button>
+      <button id="next" aria-label="Next Track">⏭️</button>
+      <button id="loop" aria-label="Loop Mode">Loop Off</button>
+      <button id="shuffle" aria-label="Shuffle Mode">Shuffle Off</button>
+      <button id="fullscreen" aria-label="Fullscreen">Fullscreen</button>
+      <button id="themeToggle" aria-label="Toggle Theme">Toggle Theme</button>
       <div class="slider-container">
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
-        <button id="mute">Mute</button>
+        <button id="mute" aria-label="Mute/Unmute">Mute</button>
       </div>
     </div>
-    <!-- Song Search -->
+    <!-- Search & Playlist -->
     <div class="search-container">
-      <input type="text" id="songSearch" placeholder="Search Songs...">
+      <input type="text" id="songSearch" placeholder="Search Songs..." aria-label="Search Songs">
     </div>
-    <!-- Search Results / Playlist -->
-    <ul class="search-results" id="searchResults"></ul>
+    <div class="playlist">
+      <ul id="playlistItems"></ul>
+    </div>
   </div>
   
   <!-- Embedded JavaScript -->
   <script>
     /* ===== DOM Elements ===== */
-    const mediaPlayer = document.getElementById("media-player");
+    const videoPlayer = document.getElementById("video-player");
+    const audioCanvas = document.getElementById("audio-visualizer");
+    const ctx = audioCanvas.getContext("2d");
+    const mediaContainer = document.getElementById("media-container");
     const playBtn = document.getElementById("play");
     const pauseBtn = document.getElementById("pause");
     const nextBtn = document.getElementById("next");
@@ -262,7 +276,6 @@
     const loopBtn = document.getElementById("loop");
     const shuffleBtn = document.getElementById("shuffle");
     const fullscreenBtn = document.getElementById("fullscreen");
-    const managePlaylistBtn = document.getElementById("managePlaylist");
     const themeToggleBtn = document.getElementById("themeToggle");
     const volumeSlider = document.getElementById("volume");
     const muteBtn = document.getElementById("mute");
@@ -272,127 +285,141 @@
     const trackTitle = document.getElementById("track-title");
     const trackMeta = document.getElementById("track-meta");
     const albumArt = document.getElementById("album-art");
-    const visualizer = document.getElementById("visualizer");
-    const ctx = visualizer.getContext("2d");
     const songSearchInput = document.getElementById("songSearch");
-    const searchResultsEl = document.getElementById("searchResults");
-  
+    const playlistEl = document.getElementById("playlistItems");
+
     /* ===== Player State ===== */
     let currentIndex = 0;
     let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
     let isShuffle = false;
     let muted = false;
-  
+    let playlist = [];
+    // We use videoPlayer as the single media element for both audio and video.
+    let activeMedia = videoPlayer;
+
     /* ===== Predefined Songs List ===== */
+    // A mix of audio and video files (FLAC, MP3, OGG, MP4, etc.)
     const songs = [
-      { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", type: "audio" },
-      { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", type: "audio" },
-      { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video" }
-      // Add more songs as needed.
+      { title: "Electro Beat", src: "https://example.com/music/beat.mp3", type: "audio", meta: "Artist 1" },
+      { title: "Smooth Jazz", src: "https://example.com/music/jazz.ogg", type: "audio", meta: "Artist 2" },
+      { title: "Vibrant Visuals", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video", meta: "Video Title" }
+      // Add more songs/formats as needed.
     ];
-  
-    /* ===== Auto-Save & Load Last Position ===== */
+
+    /* ===== Auto-Save & Load Playlist ===== */
     window.addEventListener("load", () => {
       const savedIndex = localStorage.getItem("lastIndex");
       const savedTime = localStorage.getItem("lastTime");
+      const savedPlaylist = localStorage.getItem("playlistOrder");
+      if (savedPlaylist) {
+        playlist = JSON.parse(savedPlaylist);
+      } else {
+        playlist = songs.map((s, i) => i);
+      }
+      populatePlaylist();
       if (savedIndex !== null && songs[savedIndex]) {
         currentIndex = parseInt(savedIndex);
       }
       playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
-      // Display the full songs list as default.
       displaySearchResults(songs);
     });
     window.addEventListener("beforeunload", () => {
       localStorage.setItem("lastIndex", currentIndex);
-      localStorage.setItem("lastTime", mediaPlayer.currentTime);
+      localStorage.setItem("lastTime", activeMedia.currentTime);
+      localStorage.setItem("playlistOrder", JSON.stringify(playlist));
     });
-  
-    /* ===== Web Audio API Setup (Visualizer & Equalizer) ===== */
+
+    /* ===== Web Audio API Setup for Audio Visualization ===== */
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const sourceNode = audioCtx.createMediaElementSource(mediaPlayer);
-    // Basic equalizer filters (unchanged)
-    const bassFilter = audioCtx.createBiquadFilter();
-    bassFilter.type = "lowshelf";
-    bassFilter.frequency.value = 200;
-    const midFilter = audioCtx.createBiquadFilter();
-    midFilter.type = "peaking";
-    midFilter.frequency.value = 1000;
-    const trebleFilter = audioCtx.createBiquadFilter();
-    trebleFilter.type = "highshelf";
-    trebleFilter.frequency.value = 3000;
-    const analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
-    const bufferLength = analyser.frequencyBinCount;
-    const dataArray = new Uint8Array(bufferLength);
-    // Connect nodes: source -> equalizer filters -> analyser -> destination
-    sourceNode.connect(bassFilter);
-    bassFilter.connect(midFilter);
-    midFilter.connect(trebleFilter);
-    trebleFilter.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  
-    /* ===== Visualizer ===== */
-    function drawVisualizer() {
-      requestAnimationFrame(drawVisualizer);
-      analyser.getByteFrequencyData(dataArray);
-      ctx.fillStyle = "#121212";
-      ctx.fillRect(0, 0, visualizer.width, visualizer.height);
-      const barWidth = (visualizer.width / bufferLength) * 2.5;
-      let x = 0;
-      for (let i = 0; i < bufferLength; i++) {
-        const barHeight = dataArray[i];
-        ctx.fillStyle = `rgb(${barHeight+100},50,150)`;
-        ctx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
-        x += barWidth + 1;
+    let sourceNode, analyser;
+    // Create the source node only once.
+    function setupAudioAnalyser() {
+      if (!sourceNode) {
+        sourceNode = audioCtx.createMediaElementSource(videoPlayer);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        sourceNode.connect(analyser);
+        analyser.connect(audioCtx.destination);
       }
     }
-    drawVisualizer();
+    setupAudioAnalyser();
+
+    /* ===== Visualizer: Waveform for Audio ===== */
+    function drawWaveform() {
+      if (!analyser) return;
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Uint8Array(bufferLength);
+      analyser.getByteTimeDomainData(dataArray);
+      ctx.fillStyle = "#121212";
+      ctx.fillRect(0, 0, audioCanvas.width, audioCanvas.height);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "var(--accent-color)";
+      ctx.beginPath();
+      const sliceWidth = audioCanvas.width / bufferLength;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = (v * audioCanvas.height) / 2;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+        x += sliceWidth;
+      }
+      ctx.lineTo(audioCanvas.width, audioCanvas.height / 2);
+      ctx.stroke();
+    }
+    function animateVisualizer() {
+      requestAnimationFrame(animateVisualizer);
+      // Draw waveform only when media type is audio.
+      if (videoPlayer.dataset.type === "audio") {
+        drawWaveform();
+      }
+    }
+    animateVisualizer();
     function resizeCanvas() {
-      visualizer.width = visualizer.clientWidth;
-      visualizer.height = visualizer.clientHeight;
+      audioCanvas.width = audioCanvas.clientWidth;
+      audioCanvas.height = audioCanvas.clientHeight;
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
-  
-    /* ===== Theme Toggle ===== */
-    let themeState = 0; // 0: dark (default), 1: neon, 2: light
-    themeToggleBtn.addEventListener("click", () => {
-      themeState = (themeState + 1) % 3;
-      document.body.classList.remove("dark", "neon", "light");
-      if (themeState === 0) document.body.classList.add("dark");
-      else if (themeState === 1) document.body.classList.add("neon");
-      else if (themeState === 2) document.body.classList.add("light");
-    });
-  
+
     /* ===== Media Playback Functions ===== */
     function playMedia(index, startTime = 0) {
       currentIndex = index;
-      const song = songs[index];
-      mediaPlayer.src = song.src;
+      const song = songs[playlist[index]];
+      updateNowPlaying(song);
+      // Set data attribute on videoPlayer to differentiate media type.
+      videoPlayer.dataset.type = song.type;
       if (song.type === "audio") {
-        mediaPlayer.setAttribute("poster", ""); // No poster for audio
-      } else {
-        mediaPlayer.removeAttribute("poster");
+        // For audio, show waveform canvas and hide video.
+        audioCanvas.style.opacity = 1;
+        videoPlayer.style.opacity = 0;
+        activeMedia = videoPlayer;
+      } else if (song.type === "video") {
+        // For video, show video element.
+        audioCanvas.style.opacity = 0;
+        videoPlayer.style.opacity = 1;
+        activeMedia = videoPlayer;
       }
-      mediaPlayer.load();
-      mediaPlayer.currentTime = startTime;
-      mediaPlayer.play();
-      updateNowPlaying(song.title, song.type);
+      videoPlayer.src = song.src;
+      videoPlayer.load();
+      videoPlayer.currentTime = startTime;
+      videoPlayer.play();
     }
-    function updateNowPlaying(title, type) {
-      trackTitle.textContent = title;
-      trackMeta.textContent = type === "audio" ? "Artist - Album" : "Video Title";
+    function updateNowPlaying(song) {
+      trackTitle.textContent = song.title;
+      trackMeta.textContent = song.meta;
+      albumArt.src = "https://via.placeholder.com/80x80.png?text=Art";
     }
-  
+
     /* ===== Standard Controls ===== */
     playBtn.addEventListener("click", () => {
-      if (!mediaPlayer.src) playMedia(currentIndex);
-      else mediaPlayer.play();
+      if (!activeMedia.src) playMedia(currentIndex);
+      else activeMedia.play();
       playBtn.style.display = "none";
       pauseBtn.style.display = "inline-block";
     });
     pauseBtn.addEventListener("click", () => {
-      mediaPlayer.pause();
+      activeMedia.pause();
       pauseBtn.style.display = "none";
       playBtn.style.display = "inline-block";
     });
@@ -408,52 +435,46 @@
     });
     loopBtn.addEventListener("click", () => {
       loopState = (loopState + 1) % 3;
-      if (loopState === 0) loopBtn.textContent = "Loop Off";
-      else if (loopState === 1) loopBtn.textContent = "Repeat One";
-      else if (loopState === 2) loopBtn.textContent = "Repeat All";
+      loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
     });
     shuffleBtn.addEventListener("click", () => {
       isShuffle = !isShuffle;
       shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
     });
     fullscreenBtn.addEventListener("click", () => {
-      if (mediaPlayer.requestFullscreen) mediaPlayer.requestFullscreen();
-      else if (mediaPlayer.webkitRequestFullscreen) mediaPlayer.webkitRequestFullscreen();
+      if (activeMedia.requestFullscreen) activeMedia.requestFullscreen();
+      else if (activeMedia.webkitRequestFullscreen) activeMedia.webkitRequestFullscreen();
     });
-    managePlaylistBtn.addEventListener("click", () => {
-      // If you had a separate playlist management page, navigate to it.
-      alert("Playlist management is disabled in this version. Use the search to play songs.");
-    });
-  
+    
     /* ===== Volume & Mute ===== */
     volumeSlider.addEventListener("input", () => {
-      mediaPlayer.volume = volumeSlider.value;
-      if (mediaPlayer.volume > 0) {
+      activeMedia.volume = volumeSlider.value;
+      if (activeMedia.volume > 0) {
         muted = false;
         muteBtn.textContent = "Mute";
       }
     });
     muteBtn.addEventListener("click", () => {
       muted = !muted;
-      mediaPlayer.muted = muted;
+      activeMedia.muted = muted;
       muteBtn.textContent = muted ? "Unmute" : "Mute";
     });
-  
+    
     /* ===== Seek Bar & Tooltip ===== */
-    mediaPlayer.addEventListener("timeupdate", () => {
-      const percent = (mediaPlayer.currentTime / mediaPlayer.duration) * 100;
+    videoPlayer.addEventListener("timeupdate", () => {
+      const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
       progressBar.style.width = percent + "%";
     });
     seekBar.addEventListener("click", (e) => {
       const rect = seekBar.getBoundingClientRect();
       const clickX = e.clientX - rect.left;
-      const newTime = (clickX / seekBar.offsetWidth) * mediaPlayer.duration;
-      mediaPlayer.currentTime = newTime;
+      const newTime = (clickX / seekBar.offsetWidth) * videoPlayer.duration;
+      videoPlayer.currentTime = newTime;
     });
     seekBar.addEventListener("mousemove", (e) => {
       const rect = seekBar.getBoundingClientRect();
       const hoverX = e.clientX - rect.left;
-      const time = (hoverX / seekBar.offsetWidth) * mediaPlayer.duration;
+      const time = (hoverX / seekBar.offsetWidth) * videoPlayer.duration;
       seekTooltip.textContent = formatTime(time);
       seekTooltip.style.left = hoverX + "px";
       seekTooltip.style.display = "block";
@@ -467,13 +488,59 @@
       const seconds = Math.floor(time % 60).toString().padStart(2, "0");
       return `${minutes}:${seconds}`;
     }
-  
+
+    /* ===== Handle Track End ===== */
+    videoPlayer.addEventListener("ended", () => {
+      if (loopState === 1) {
+        playMedia(currentIndex);
+      } else if (loopState === 2) {
+        nextBtn.click();
+      } else {
+        nextBtn.click();
+      }
+    });
+
+    /* ===== Search & Playlist ===== */
+    function displaySearchResults(results) {
+      playlistEl.innerHTML = "";
+      results.forEach((song, idx) => {
+        const li = document.createElement("li");
+        li.textContent = song.title;
+        li.dataset.index = idx;
+        li.addEventListener("click", () => {
+          const songIndex = songs.findIndex(s => s.src === song.src);
+          if (songIndex !== -1) playMedia(songIndex);
+        });
+        playlistEl.appendChild(li);
+      });
+    }
+    songSearchInput.addEventListener("input", () => {
+      const query = songSearchInput.value.toLowerCase();
+      if (query === "") {
+        displaySearchResults(songs);
+        return;
+      }
+      const results = songs.filter(song => song.title.toLowerCase().includes(query));
+      displaySearchResults(results);
+    });
+    function populatePlaylist() {
+      playlistEl.innerHTML = "";
+      playlist.forEach(i => {
+        const song = songs[i];
+        const li = document.createElement("li");
+        li.textContent = song.title;
+        li.dataset.index = i;
+        li.addEventListener("click", () => playMedia(i));
+        playlistEl.appendChild(li);
+      });
+    }
+    
     /* ===== Keyboard Shortcuts ===== */
     document.addEventListener("keydown", (e) => {
       switch(e.key) {
         case " ":
           e.preventDefault();
-          if (mediaPlayer.paused) playBtn.click();
+          if (activeMedia.paused) playBtn.click();
           else pauseBtn.click();
           break;
         case "ArrowRight":
@@ -492,41 +559,10 @@
           break;
       }
     });
-  
+    
     /* ===== Resume AudioContext on Interaction ===== */
     document.body.addEventListener("click", () => {
       if (audioCtx.state === "suspended") audioCtx.resume();
-    });
-  
-    /* ===== Song Search Functionality ===== */
-    // Display search results based on query
-    function displaySearchResults(results) {
-      searchResultsEl.innerHTML = "";
-      results.forEach((song, idx) => {
-        const li = document.createElement("li");
-        li.textContent = song.title;
-        li.addEventListener("click", () => {
-          // When clicked, play the song and clear search results
-          const songIndex = songs.findIndex(s => s.src === song.src);
-          if (songIndex !== -1) {
-            playMedia(songIndex);
-            searchResultsEl.innerHTML = "";
-            songSearchInput.value = "";
-          }
-        });
-        searchResultsEl.appendChild(li);
-      });
-    }
-    // On input in the search box, filter the songs list
-    songSearchInput.addEventListener("input", () => {
-      const query = songSearchInput.value.toLowerCase();
-      if (query === "") {
-        // If the query is empty, display all songs again.
-        displaySearchResults(songs);
-        return;
-      }
-      const results = songs.filter(song => song.title.toLowerCase().includes(query));
-      displaySearchResults(results);
     });
   </script>
 </body>
