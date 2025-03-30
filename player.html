@@ -298,12 +298,11 @@
     let activeMedia = videoPlayer;
 
     /* ===== Predefined Songs List ===== */
-    // A mix of audio and video files (FLAC, MP3, OGG, MP4, etc.)
+    // Using your original links.
     const songs = [
-      { title: "Electro Beat", src: "https://example.com/music/beat.mp3", type: "audio", meta: "Artist 1" },
-      { title: "Smooth Jazz", src: "https://example.com/music/jazz.ogg", type: "audio", meta: "Artist 2" },
-      { title: "Vibrant Visuals", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video", meta: "Video Title" }
-      // Add more songs/formats as needed.
+      { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", type: "audio", meta: "Artist - Album" },
+      { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", type: "audio", meta: "Artist - Album" },
+      { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", type: "video", meta: "Video Title" }
     ];
 
     /* ===== Auto-Save & Load Playlist ===== */
@@ -493,8 +492,6 @@
     videoPlayer.addEventListener("ended", () => {
       if (loopState === 1) {
         playMedia(currentIndex);
-      } else if (loopState === 2) {
-        nextBtn.click();
       } else {
         nextBtn.click();
       }
