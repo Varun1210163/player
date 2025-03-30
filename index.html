@@ -1,155 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ultra Advanced Music Website - Home</title>
-  <meta name="description" content="A futuristic, ultra-advanced music website with vibrant colors, animations, and an advanced music player.">
+  <title>Ultra Advanced Music Experience</title>
+  <meta name="description" content="A futuristic, ultra-advanced music website with dynamic animations and an immersive music player experience.">
   <meta name="author" content="Varun Prasath">
-  <!-- Embedded CSS -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* Vibrant Color Theme */
     :root {
       --primary-color: #FF2D95;
       --secondary-color: #2DFEFF;
       --accent-color: #FFDA2D;
-      --bg-dark: #1a1a1a;
-      --bg-darker: #121212;
+      --bg-dark: #0a0a0a;
       --text-light: #ffffff;
-      --border-radius: 8px;
-      --transition-speed: 0.3s;
-      --shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+      --border-radius: 12px;
+      --transition-speed: 0.4s;
+      --shadow: 0px 10px 20px rgba(0, 0, 0, 0.6);
     }
-    /* Basic Global Styles */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Orbitron', sans-serif;
       background: var(--bg-dark);
       color: var(--text-light);
       overflow-x: hidden;
     }
     header {
-      background: var(--primary-color);
+      background: rgba(255, 45, 149, 0.9);
       padding: 1rem;
       text-align: center;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: bold;
       box-shadow: var(--shadow);
       position: sticky;
       top: 0;
       z-index: 1000;
     }
-    /* Navigation */
     nav ul {
       list-style: none;
       display: flex;
       justify-content: center;
-      gap: 1rem;
+      gap: 1.5rem;
     }
     nav a {
       color: var(--text-light);
       text-decoration: none;
       font-weight: bold;
-      transition: color var(--transition-speed);
+      font-size: 1.2rem;
+      transition: transform var(--transition-speed), color var(--transition-speed);
     }
     nav a:hover {
       color: var(--accent-color);
+      transform: scale(1.1);
     }
-  </style>
-  <style>
     .hero {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      background-size: 200% 200%;
-      animation: gradientFlow 10s ease infinite;
-      padding: 4rem 2rem;
+      padding: 6rem 2rem;
       text-align: center;
+      animation: gradientShift 10s infinite alternate;
     }
-    @keyframes gradientFlow {
+    @keyframes gradientShift {
       0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
     }
-    /* Rotating Cube Styles */
-    #cube-container {
-      width: 120px;
-      height: 120px;
-      margin: 30px auto;
-      perspective: 600px;
+    .hero h2 {
+      font-size: 3rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      animation: textGlow 1.5s infinite alternate;
     }
-    .cube {
-      width: 120px;
-      height: 120px;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: rotateCube 10s infinite linear;
+    .hero p {
+      font-size: 1.4rem;
+      margin-top: 10px;
+      opacity: 0.9;
     }
-    .face {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      border: 2px solid var(--primary-color);
-      background: var(--secondary-color);
-      box-shadow: inset 0 0 10px rgba(0,0,0,0.7);
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 10px var(--accent-color); }
+      100% { text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--secondary-color); }
     }
-    .front  { transform: translateZ(60px); }
-    .back   { transform: rotateY(180deg) translateZ(60px); }
-    .right  { transform: rotateY(90deg) translateZ(60px); }
-    .left   { transform: rotateY(-90deg) translateZ(60px); }
-    .top    { transform: rotateX(90deg) translateZ(60px); }
-    .bottom { transform: rotateX(-90deg) translateZ(60px); }
-    @keyframes rotateCube {
-      0%   { transform: rotateX(0deg) rotateY(0deg); }
-      50%  { transform: rotateX(180deg) rotateY(180deg); }
-      100% { transform: rotateX(360deg) rotateY(360deg); }
+    .btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 14px 28px;
+      background: var(--accent-color);
+      color: var(--bg-dark);
+      font-weight: bold;
+      text-transform: uppercase;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+      animation: pulse 2s infinite;
+    }
+    .btn:hover {
+      transform: scale(1.2);
+      box-shadow: 0px 15px 30px rgba(255, 218, 45, 0.8);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: rgba(255, 45, 149, 0.9);
+      margin-top: 2rem;
     }
   </style>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TVCH6ZD4TM"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    
-    gtag('config', 'G-TVCH6ZD4TM');
-  </script>
 </head>
 <body>
   <header>
     <nav>
       <ul>
-        <li>
-          <a href="#home">Home</a>
-        </li>
-        <li>
-          <!-- Link to the separate player page -->
-          <a href="player.html">Music</a>
-        </li>
+        <li><a href="#home">Home</a></li>
+        <li><a href="player.html">Music</a></li>
       </ul>
     </nav>
   </header>
-  <!-- Home / Hero Section -->
   <section id="home" class="hero">
-    <h2>Welcome to the Future of Music</h2>
-    <p>Experience vibrant colors, dynamic animations, and an ultra-advanced music player.</p>
-    <div id="cube-container">
-      <div class="cube">
-        <div class="face front"></div>
-        <div class="face back"></div>
-        <div class="face right"></div>
-        <div class="face left"></div>
-        <div class="face top"></div>
-        <div class="face bottom"></div>
-      </div>
-    </div>
+    <h2>Step Into the Future of Music</h2>
+    <p>Experience an ultra-modern interface with vibrant visuals and seamless playback.</p>
+    <a href="player.html" class="btn">Start Listening</a>
   </section>
-  <!-- Footer -->
   <footer>
     <p>© 2025 Ultra Advanced Music Website. All Rights Reserved.</p>
   </footer>
-  <!-- (No additional JavaScript needed for this page.) -->
 </body>
 </html>
