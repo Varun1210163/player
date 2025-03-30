@@ -194,6 +194,15 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
       cursor: pointer;
     }
+    /* Mobile-specific adjustments */
+    @media (max-width: 480px) {
+      #media-container {
+        max-height: 300px;
+      }
+      #audio-visualizer, #video-player {
+        height: 100%;
+      }
+    }
   </style>
 </head>
 <body class="dark">
@@ -371,6 +380,8 @@
         audioCanvas.height = audioCanvas.clientHeight;
       }
       window.addEventListener("resize", resizeCanvas);
+      // Listen for orientation changes on mobile devices.
+      window.addEventListener("orientationchange", resizeCanvas);
       resizeCanvas();
           
       /* ===== Determine Media Type Based on File Extension ===== */
