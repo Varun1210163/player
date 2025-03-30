@@ -283,7 +283,6 @@
     const seekTooltip = document.getElementById("seek-tooltip");
     const trackTitle = document.getElementById("track-title");
     const trackMeta = document.getElementById("track-meta");
-    const albumArt = document.getElementById("album-art");
     const songSearchInput = document.getElementById("songSearch");
     const playlistEl = document.getElementById("playlistItems");
 
@@ -406,8 +405,6 @@
     function updateNowPlaying(song) {
       trackTitle.textContent = song.title;
       trackMeta.textContent = song.meta;
-      albumArt.src = "https://via.placeholder.com/80x80.png?text=Art";
-    }
 
     /* ===== Standard Controls ===== */
     playBtn.addEventListener("click", () => {
