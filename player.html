@@ -91,41 +91,29 @@
       opacity: 0.8;
       margin: 0;
     }
-    /* Audio Visualizer Container */
-    #audio-container {
-      width: 100%;
-      max-height: 300px;
-      background: var(--bg-dark);
-      border-radius: var(--border-radius);
-      margin-bottom: 1rem;
-      overflow: hidden;
-      display: none; /* hidden by default */
-    }
-    #audio-visualizer {
-      width: 100%;
-      height: 100%;
-      display: block;
-      transition: opacity var(--transition-speed);
-    }
-    /* Video Media Container */
-    #media-container {
+    /* Display Container: for video content or audio waveform */
+    #display-container {
       position: relative;
       width: 100%;
-      max-height: 450px;
+      height: 150px; /* Compact height */
       background: #000;
       border-radius: var(--border-radius);
       overflow: hidden;
-      display: none; /* hidden by default */
+      margin-bottom: 1rem;
     }
+    /* Both media elements inside the display container take full size */
+    #audio-visualizer,
     #video-player {
       width: 100%;
-      height: auto;
-      display: block;
-      transition: opacity var(--transition-speed);
+      height: 100%;
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 2;
+      transition: opacity var(--transition-speed);
+    }
+    /* Hide an element when not in use */
+    .hidden {
+      display: none;
     }
     /* Seek Bar */
     .seek-bar {
@@ -197,11 +185,8 @@
     }
     /* Mobile-specific adjustments */
     @media (max-width: 480px) {
-      #media-container {
-        max-height: 300px;
-      }
-      #audio-container {
-        max-height: 200px;
+      #display-container {
+        height: 120px;
       }
     }
   </style>
@@ -218,13 +203,10 @@
         <p id="track-meta">Artist - Album</p>
       </div>
     </div>
-    <!-- Audio Visualizer Container (placed above the video player) -->
-    <div id="audio-container">
-      <canvas id="audio-visualizer"></canvas>
-    </div>
-    <!-- Video Media Container -->
-    <div id="media-container">
-      <video id="video-player" playsinline aria-label="Media Player"></video>
+    <!-- Display Container: Shows the video content or audio waveform -->
+    <div id="display-container">
+      <canvas id="audio-visualizer" class="hidden"></canvas>
+      <video id="video-player" playsinline aria-label="Media Player" class="hidden"></video>
     </div>
     <!-- Seek Bar -->
     <div class="seek-bar" id="seek-bar" aria-label="Seek Bar">
@@ -259,8 +241,7 @@
       /* ===== DOM Elements ===== */
       const videoPlayer = document.getElementById("video-player");
       const audioCanvas = document.getElementById("audio-visualizer");
-      const audioContainer = document.getElementById("audio-container");
-      const mediaContainer = document.getElementById("media-container");
+      const displayContainer = document.getElementById("display-container");
       const ctx = audioCanvas.getContext("2d");
       const playBtn = document.getElementById("play");
       const pauseBtn = document.getElementById("pause");
@@ -372,7 +353,6 @@
       }
       function animateVisualizer() {
         requestAnimationFrame(animateVisualizer);
-        // Only draw the waveform if the current media is audio
         if (currentMediaType === "audio") {
           drawWaveform();
         }
@@ -384,7 +364,6 @@
         audioCanvas.height = audioCanvas.clientHeight;
       }
       window.addEventListener("resize", resizeCanvas);
-      // Listen for orientation changes on mobile devices.
       window.addEventListener("orientationchange", resizeCanvas);
       resizeCanvas();
           
@@ -404,19 +383,18 @@
         const song = songs[playlist[index]];
         trackTitle.textContent = song.title;
         trackMeta.textContent = song.meta;
-        // Determine the media type from the file extension
         const type = getMediaTypeForSource(song.src);
         currentMediaType = type;
         
-        // Toggle display based on media type:
+        // Toggle display elements based on media type.
         if (type === "audio") {
-          // Show the audio container (with the waveform) and hide the video container.
-          audioContainer.style.display = "block";
-          mediaContainer.style.display = "none";
+          // Show the canvas (waveform) and hide the video element.
+          audioCanvas.classList.remove("hidden");
+          videoPlayer.classList.add("hidden");
         } else if (type === "video") {
-          // Hide the audio container and show the video container.
-          audioContainer.style.display = "none";
-          mediaContainer.style.display = "block";
+          // Show the video element and hide the canvas.
+          videoPlayer.classList.remove("hidden");
+          audioCanvas.classList.add("hidden");
         }
         
         // Load and play the media.
@@ -487,7 +465,7 @@
       });
           
       videoPlayer.addEventListener("timeupdate", () => {
-        if(videoPlayer.duration){
+        if (videoPlayer.duration) {
           const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
           progressBar.style.width = percent + "%";
         }
