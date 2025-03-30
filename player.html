@@ -100,7 +100,7 @@
       border-radius: var(--border-radius);
       overflow: hidden;
     }
-    /* Video Element (used for both audio & video playback) */
+    /* Video Element (used for video playback) */
     #video-player {
       width: 100%;
       height: auto;
@@ -109,6 +109,7 @@
       position: absolute;
       top: 0;
       left: 0;
+      opacity: 0;
     }
     /* Audio Visualizer Canvas */
     #audio-visualizer {
@@ -121,6 +122,7 @@
       left: 0;
       background: var(--bg-dark);
       border-radius: var(--border-radius);
+      opacity: 0;
     }
     /* Seek Bar */
     .seek-bar {
@@ -268,8 +270,8 @@
       let isShuffle = false;
       let muted = false;
       let playlist = [];
-      // Use videoPlayer as the single media element
-      let activeMedia = videoPlayer;
+      // Hold current media type: "audio" or "video"
+      let currentMediaType = null;
         
       /* ===== Predefined Songs List ===== */
       const songs = [
@@ -281,7 +283,6 @@
       /* ===== Playlist Population ===== */
       function populatePlaylist() {
         playlistEl.innerHTML = "";
-        // If no saved playlist order, use default order
         if (playlist.length === 0) {
           playlist = songs.map((s, i) => i);
         }
@@ -313,7 +314,7 @@
       });
       window.addEventListener("beforeunload", () => {
         localStorage.setItem("lastIndex", currentIndex);
-        localStorage.setItem("lastTime", activeMedia.currentTime);
+        localStorage.setItem("lastTime", videoPlayer.currentTime);
         localStorage.setItem("playlistOrder", JSON.stringify(playlist));
       });
         
@@ -356,8 +357,8 @@
       }
       function animateVisualizer() {
         requestAnimationFrame(animateVisualizer);
-        // Only draw waveform if playing audio
-        if (getMediaType() === "audio") {
+        // Only draw the waveform if the current media is audio
+        if (currentMediaType === "audio") {
           drawWaveform();
         }
       }
@@ -373,55 +374,47 @@
       /* ===== Determine Media Type Based on File Extension ===== */
       function getMediaTypeForSource(src) {
         const extension = src.split('.').pop().toLowerCase();
-        // List of video and audio extensions (you can add more formats here)
         const videoExtensions = ["mp4", "webm", "ogg"];
         const audioExtensions = ["mp3", "flac", "wav", "aac"];
         if (videoExtensions.includes(extension)) return "video";
         else if (audioExtensions.includes(extension)) return "audio";
         else return "audio"; // default fallback
       }
-      function getMediaType() {
-        return getMediaTypeForSource(videoPlayer.src);
-      }
         
       /* ===== Media Playback Functions ===== */
       function playMedia(index, startTime = 0) {
         currentIndex = index;
         const song = songs[playlist[index]];
-        updateNowPlaying(song);
+        trackTitle.textContent = song.title;
+        trackMeta.textContent = song.meta;
+        // Determine the media type from the file extension
         const type = getMediaTypeForSource(song.src);
-        videoPlayer.dataset.type = type;
-        // Toggle UI elements based on media type
+        currentMediaType = type;
+        // Toggle visibility based on media type
         if (type === "audio") {
           audioCanvas.style.opacity = 1;
           videoPlayer.style.opacity = 0;
-          activeMedia = videoPlayer;
         } else if (type === "video") {
           audioCanvas.style.opacity = 0;
           videoPlayer.style.opacity = 1;
-          activeMedia = videoPlayer;
         }
+        // Load and play the media
         videoPlayer.src = song.src;
         videoPlayer.load();
         videoPlayer.currentTime = startTime;
         videoPlayer.play();
       }
         
-      function updateNowPlaying(song) {
-        trackTitle.textContent = song.title;
-        trackMeta.textContent = song.meta;
-      }
-        
       /* ===== Standard Controls ===== */
       playBtn.addEventListener("click", () => {
-        if (!activeMedia.src) playMedia(currentIndex);
-        else activeMedia.play();
+        if (!videoPlayer.src) playMedia(currentIndex);
+        else videoPlayer.play();
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
       });
         
       pauseBtn.addEventListener("click", () => {
-        activeMedia.pause();
+        videoPlayer.pause();
         pauseBtn.style.display = "none";
         playBtn.style.display = "inline-block";
       });
@@ -449,20 +442,18 @@
       });
         
       fullscreenBtn.addEventListener("click", () => {
-        if (activeMedia.requestFullscreen) activeMedia.requestFullscreen();
-        else if (activeMedia.webkitRequestFullscreen) activeMedia.webkitRequestFullscreen();
+        if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
+        else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
       });
         
-      /* ===== Theme Toggle ===== */
       themeToggleBtn.addEventListener("click", () => {
         document.body.classList.toggle("dark");
         document.body.classList.toggle("light");
       });
         
-      /* ===== Volume & Mute ===== */
       volumeSlider.addEventListener("input", () => {
-        activeMedia.volume = volumeSlider.value;
-        if (activeMedia.volume > 0) {
+        videoPlayer.volume = volumeSlider.value;
+        if (videoPlayer.volume > 0) {
           muted = false;
           muteBtn.textContent = "Mute";
         }
@@ -470,11 +461,10 @@
         
       muteBtn.addEventListener("click", () => {
         muted = !muted;
-        activeMedia.muted = muted;
+        videoPlayer.muted = muted;
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       });
         
-      /* ===== Seek Bar & Tooltip ===== */
       videoPlayer.addEventListener("timeupdate", () => {
         if(videoPlayer.duration){
           const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
@@ -509,7 +499,6 @@
         return `${minutes}:${seconds}`;
       }
         
-      /* ===== Handle Track End ===== */
       videoPlayer.addEventListener("ended", () => {
         if (loopState === 1) {
           playMedia(currentIndex);
@@ -518,12 +507,11 @@
         }
       });
         
-      /* ===== Keyboard Shortcuts ===== */
       document.addEventListener("keydown", (e) => {
         switch(e.key) {
           case " ":
             e.preventDefault();
-            if (activeMedia.paused) playBtn.click();
+            if (videoPlayer.paused) playBtn.click();
             else pauseBtn.click();
             break;
           case "ArrowRight":
@@ -543,7 +531,6 @@
         }
       });
         
-      /* ===== Resume AudioContext on Interaction ===== */
       document.body.addEventListener("click", () => {
         if (audioCtx.state === "suspended") audioCtx.resume();
       });
