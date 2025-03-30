@@ -109,7 +109,8 @@
       position: absolute;
       top: 0;
       left: 0;
-      opacity: 0;
+      /* Ensuring the video is on top when visible */
+      z-index: 2;
     }
     /* Audio Visualizer Canvas */
     #audio-visualizer {
@@ -122,7 +123,8 @@
       left: 0;
       background: var(--bg-dark);
       border-radius: var(--border-radius);
-      opacity: 0;
+      /* Placed behind the video element if needed */
+      z-index: 1;
     }
     /* Seek Bar */
     .seek-bar {
@@ -239,7 +241,7 @@
       <ul id="playlistItems"></ul>
     </div>
   </div>
-      
+        
   <!-- Embedded JavaScript -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -263,7 +265,7 @@
       const trackTitle = document.getElementById("track-title");
       const trackMeta = document.getElementById("track-meta");
       const playlistEl = document.getElementById("playlistItems");
-        
+          
       /* ===== Player State ===== */
       let currentIndex = 0;
       let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
@@ -272,14 +274,14 @@
       let playlist = [];
       // Hold current media type: "audio" or "video"
       let currentMediaType = null;
-        
+          
       /* ===== Predefined Songs List ===== */
       const songs = [
         { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", meta: "Artist - Album" },
         { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", meta: "Artist - Album" },
         { title: "Video Track 1", src: "https://www.w3schools.com/html/mov_bbb.mp4", meta: "Video Title" }
       ];
-        
+          
       /* ===== Playlist Population ===== */
       function populatePlaylist() {
         playlistEl.innerHTML = "";
@@ -295,7 +297,7 @@
           playlistEl.appendChild(li);
         });
       }
-        
+          
       /* ===== Auto-Save & Load Playlist ===== */
       window.addEventListener("load", () => {
         const savedIndex = localStorage.getItem("lastIndex");
@@ -317,7 +319,7 @@
         localStorage.setItem("lastTime", videoPlayer.currentTime);
         localStorage.setItem("playlistOrder", JSON.stringify(playlist));
       });
-        
+          
       /* ===== Web Audio API Setup for Audio Visualization ===== */
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       let sourceNode, analyser;
@@ -331,7 +333,7 @@
         }
       }
       setupAudioAnalyser();
-        
+          
       /* ===== Visualizer: Waveform for Audio ===== */
       function drawWaveform() {
         if (!analyser) return;
@@ -363,14 +365,14 @@
         }
       }
       animateVisualizer();
-        
+          
       function resizeCanvas() {
         audioCanvas.width = audioCanvas.clientWidth;
         audioCanvas.height = audioCanvas.clientHeight;
       }
       window.addEventListener("resize", resizeCanvas);
       resizeCanvas();
-        
+          
       /* ===== Determine Media Type Based on File Extension ===== */
       function getMediaTypeForSource(src) {
         const extension = src.split('.').pop().toLowerCase();
@@ -380,7 +382,7 @@
         else if (audioExtensions.includes(extension)) return "audio";
         else return "audio"; // default fallback
       }
-        
+          
       /* ===== Media Playback Functions ===== */
       function playMedia(index, startTime = 0) {
         currentIndex = index;
@@ -390,21 +392,25 @@
         // Determine the media type from the file extension
         const type = getMediaTypeForSource(song.src);
         currentMediaType = type;
-        // Toggle visibility based on media type
+        
+        // Toggle display based on media type:
         if (type === "audio") {
-          audioCanvas.style.opacity = 1;
-          videoPlayer.style.opacity = 0;
+          // Show the waveform canvas and hide the video element.
+          audioCanvas.style.display = "block";
+          videoPlayer.style.display = "none";
         } else if (type === "video") {
-          audioCanvas.style.opacity = 0;
-          videoPlayer.style.opacity = 1;
+          // Hide the waveform canvas and show the video element.
+          audioCanvas.style.display = "none";
+          videoPlayer.style.display = "block";
         }
+        
         // Load and play the media
         videoPlayer.src = song.src;
         videoPlayer.load();
         videoPlayer.currentTime = startTime;
         videoPlayer.play();
       }
-        
+          
       /* ===== Standard Controls ===== */
       playBtn.addEventListener("click", () => {
         if (!videoPlayer.src) playMedia(currentIndex);
@@ -412,45 +418,45 @@
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
       });
-        
+          
       pauseBtn.addEventListener("click", () => {
         videoPlayer.pause();
         pauseBtn.style.display = "none";
         playBtn.style.display = "inline-block";
       });
-        
+          
       nextBtn.addEventListener("click", () => {
         if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
         else currentIndex = (currentIndex + 1) % songs.length;
         playMedia(currentIndex);
       });
-        
+          
       prevBtn.addEventListener("click", () => {
         if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
         else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
         playMedia(currentIndex);
       });
-        
+          
       loopBtn.addEventListener("click", () => {
         loopState = (loopState + 1) % 3;
         loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
       });
-        
+          
       shuffleBtn.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
       });
-        
+          
       fullscreenBtn.addEventListener("click", () => {
         if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
         else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
       });
-        
+          
       themeToggleBtn.addEventListener("click", () => {
         document.body.classList.toggle("dark");
         document.body.classList.toggle("light");
       });
-        
+          
       volumeSlider.addEventListener("input", () => {
         videoPlayer.volume = volumeSlider.value;
         if (videoPlayer.volume > 0) {
@@ -458,27 +464,27 @@
           muteBtn.textContent = "Mute";
         }
       });
-        
+          
       muteBtn.addEventListener("click", () => {
         muted = !muted;
         videoPlayer.muted = muted;
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       });
-        
+          
       videoPlayer.addEventListener("timeupdate", () => {
         if(videoPlayer.duration){
           const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
           progressBar.style.width = percent + "%";
         }
       });
-        
+          
       seekBar.addEventListener("click", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const newTime = (clickX / seekBar.offsetWidth) * videoPlayer.duration;
         videoPlayer.currentTime = newTime;
       });
-        
+          
       seekBar.addEventListener("mousemove", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const hoverX = e.clientX - rect.left;
@@ -487,18 +493,18 @@
         seekTooltip.style.left = hoverX + "px";
         seekTooltip.style.display = "block";
       });
-        
+          
       seekBar.addEventListener("mouseout", () => {
         seekTooltip.style.display = "none";
       });
-        
+          
       function formatTime(time) {
         if (isNaN(time)) return "0:00";
         const minutes = Math.floor(time / 60);
         const seconds = Math.floor(time % 60).toString().padStart(2, "0");
         return `${minutes}:${seconds}`;
       }
-        
+          
       videoPlayer.addEventListener("ended", () => {
         if (loopState === 1) {
           playMedia(currentIndex);
@@ -506,7 +512,7 @@
           nextBtn.click();
         }
       });
-        
+          
       document.addEventListener("keydown", (e) => {
         switch(e.key) {
           case " ":
@@ -530,7 +536,7 @@
             break;
         }
       });
-        
+          
       document.body.addEventListener("click", () => {
         if (audioCtx.state === "suspended") audioCtx.resume();
       });
