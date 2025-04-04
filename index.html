@@ -1,66 +1,111 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ultra Advanced Music Experience</title>
-  <meta name="description" content="A futuristic, ultra-advanced music website with dynamic animations and an immersive music player experience.">
-  <meta name="author" content="Varun Prasath">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="description" content="A futuristic, ultra-advanced music website with dynamic animations, an immersive music player, interactive 3D elements, and much more." />
+  <meta name="author" content="Varun Prasath" />
+
+  <!-- (Optional) PWA Manifest -->
+  <!-- <link rel="manifest" href="manifest.json" /> -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+
   <style>
     :root {
       --primary-color: #FF2D95;
       --secondary-color: #2DFEFF;
       --accent-color: #FFDA2D;
       --bg-dark: #0a0a0a;
+      --bg-light: #f2f2f2;
       --text-light: #ffffff;
+      --text-dark: #222222;
       --border-radius: 12px;
       --transition-speed: 0.4s;
       --shadow: 0px 10px 20px rgba(0, 0, 0, 0.6);
     }
+    /* Reset & Box Sizing */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    body {
+    html, body {
+      height: 100%;
       font-family: 'Orbitron', sans-serif;
+      overflow-x: hidden;
+      transition: background var(--transition-speed), color var(--transition-speed);
+    }
+    body {
       background: var(--bg-dark);
       color: var(--text-light);
-      overflow-x: hidden;
+      position: relative;
     }
+    body.light-mode {
+      background: var(--bg-light);
+      color: var(--text-dark);
+    }
+    /* Header & Navigation */
     header {
       background: rgba(255, 45, 149, 0.9);
-      padding: 1rem;
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: bold;
-      box-shadow: var(--shadow);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       position: sticky;
       top: 0;
       z-index: 1000;
+      box-shadow: var(--shadow);
     }
     nav ul {
       list-style: none;
       display: flex;
-      justify-content: center;
       gap: 1.5rem;
     }
     nav a {
-      color: var(--text-light);
+      color: inherit;
       text-decoration: none;
       font-weight: bold;
       font-size: 1.2rem;
       transition: transform var(--transition-speed), color var(--transition-speed);
     }
     nav a:hover {
+      transform: scale(1.1);
       color: var(--accent-color);
+    }
+    /* Dark/Light Toggle Button */
+    #theme-toggle {
+      background: var(--accent-color);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: var(--shadow);
+      transition: transform var(--transition-speed);
+    }
+    #theme-toggle:hover {
       transform: scale(1.1);
     }
+    /* Particle Background Canvas (New) */
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -3;
+      background: radial-gradient(ellipse at bottom, var(--primary-color), var(--bg-dark));
+    }
+    /* Original Hero Section (Retained and Enhanced) */
     .hero {
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
       padding: 6rem 2rem;
       text-align: center;
       animation: gradientShift 10s infinite alternate;
+      position: relative;
+      z-index: 10;
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -72,16 +117,16 @@
       letter-spacing: 2px;
       animation: textGlow 1.5s infinite alternate;
     }
+    @keyframes textGlow {
+      0% { text-shadow: 0 0 10px var(--accent-color); }
+      100% { text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--secondary-color); }
+    }
     .hero p {
       font-size: 1.4rem;
       margin-top: 10px;
       opacity: 0.9;
     }
-    @keyframes textGlow {
-      0% { text-shadow: 0 0 10px var(--accent-color); }
-      100% { text-shadow: 0 0 20px var(--accent-color), 0 0 30px var(--secondary-color); }
-    }
-    /* Rotating Cube Styles */
+    /* Original Rotating Cube (Retained) */
     #cube-container {
       width: 120px;
       height: 120px;
@@ -114,6 +159,7 @@
       50%  { transform: rotateX(180deg) rotateY(180deg); }
       100% { transform: rotateX(360deg) rotateY(360deg); }
     }
+    /* Original Call to Action Button (Retained) */
     .btn {
       display: inline-block;
       margin-top: 20px;
@@ -126,12 +172,14 @@
       box-shadow: var(--shadow);
       transition: transform var(--transition-speed), box-shadow var(--transition-speed);
       animation: pulse 2s infinite;
+      text-decoration: none;
     }
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
+    /* Footer (Retained) */
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -141,6 +189,9 @@
   </style>
 </head>
 <body>
+  <!-- Particle Background Canvas -->
+  <canvas id="particle-canvas"></canvas>
+
   <header>
     <nav>
       <ul>
@@ -148,7 +199,10 @@
         <li><a href="player.html">Music</a></li>
       </ul>
     </nav>
+    <button id="theme-toggle" aria-label="Toggle Dark/Light Mode">Toggle Theme</button>
   </header>
+
+  <!-- Hero Section with Original Features -->
   <section id="home" class="hero">
     <h2>Step Into the Future of Music</h2>
     <p>Experience an ultra-modern interface with vibrant visuals and seamless playback.</p>
@@ -164,8 +218,83 @@
     </div>
     <a href="player.html" class="btn">Start Listening</a>
   </section>
+
   <footer>
     <p>© 2025 Ultra Advanced Music Website. All Rights Reserved.</p>
   </footer>
+
+  <!-- JavaScript Enhancements -->
+  <script>
+    /* Dark/Light Mode Toggle with Local Storage */
+    const themeToggle = document.getElementById('theme-toggle');
+    if(localStorage.getItem('theme') === 'light'){
+      document.body.classList.add('light-mode');
+    }
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    });
+
+    /* (Optional) Service Worker Registration for PWA Offline Support */
+    // if ('serviceWorker' in navigator) {
+    //   window.addEventListener('load', () => {
+    //     navigator.serviceWorker.register('sw.js')
+    //       .then(reg => console.log('Service Worker registered', reg))
+    //       .catch(err => console.error('Service Worker registration failed', err));
+    //   });
+    // }
+
+    /* Particle Background Animation */
+    const canvas = document.getElementById('particle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const particleCount = 100;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        // Wrap around screen edges
+        if (this.x < 0) this.x = canvas.width;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.y < 0) this.y = canvas.height;
+        if (this.y > canvas.height) this.y = 0;
+      }
+      draw() {
+        ctx.fillStyle = 'rgba(255, 45, 149, 0.7)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    function initParticles() {
+      particles = [];
+      for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+      }
+    }
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(particle => {
+        particle.update();
+        particle.draw();
+      });
+      requestAnimationFrame(animateParticles);
+    }
+    initParticles();
+    animateParticles();
+  </script>
 </body>
 </html>
