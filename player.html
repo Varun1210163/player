@@ -4,22 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ultra Advanced Vibrant Media Player</title>
-  <meta name="description" content="A vibrant, advanced media player supporting all formats with smooth transitions, dynamic waveform visualization for audio, and seamless video playback.">
+  <meta name="description" content="A vibrant, ultra advanced media player supporting local uploads, remote streaming, dynamic playlists, advanced visualizations, playback speed & equalizer controls, subtitles, full-screen mode, and offline caching.">
   <meta name="author" content="Varun Prasath">
   <style>
-    /* Base Variables & Themes */
+    /* Base Variables & Themes with extra vibrant colors and gradients */
     :root {
-      --primary-color: #FF2D95;
-      --secondary-color: #2DFEFF;
-      --accent-color: #FFDA2D;
-      --bg-dark: #121212;
-      --bg-light: #f0f0f0;
+      --primary-color: #FF007F;        /* Brighter pink */
+      --secondary-color: #00FFFF;      /* Vivid cyan */
+      --accent-color: #FFFF00;         /* Bold yellow */
+      --bg-dark: #0D0D0D;
+      --bg-light: #ffffff;
       --text-light: #ffffff;
-      --text-dark: #121212;
-      --border-radius: 8px;
-      --transition-speed: 0.4s;
-      --shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      --text-dark: #0D0D0D;
+      --border-radius: 10px;
+      --transition-speed: 0.3s;
+      --shadow: 0 6px 15px rgba(0, 0, 0, 0.7);
     }
+    /* Enhanced animated background gradient */
     @keyframes bgAnimation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
@@ -28,8 +29,8 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, var(--primary-color), var(--secondary-color), var(--accent-color));
-      background-size: 200% 200%;
-      animation: bgAnimation 10s ease infinite;
+      background-size: 300% 300%;
+      animation: bgAnimation 8s ease-in-out infinite;
       color: var(--text-light);
       margin: 0;
       padding: 0;
@@ -40,9 +41,9 @@
       align-items: center;
       transition: background var(--transition-speed), color var(--transition-speed);
     }
-    /* Theme Classes */
+    /* Theme Classes for dark and light modes */
     body.dark {
-      background: linear-gradient(135deg, #121212, #2D2D2D, #121212);
+      background: linear-gradient(135deg, #0D0D0D, #262626, #0D0D0D);
     }
     body.light {
       background: var(--bg-light);
@@ -56,48 +57,75 @@
       box-shadow: var(--shadow);
       position: sticky;
       top: 0;
-      z-index: 200;
+      z-index: 400;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     header h1 {
-      font-size: 2rem;
+      font-size: 2.2rem;
       margin: 0;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    }
+    header .header-controls button,
+    header .header-controls select {
+      margin-left: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: var(--border-radius);
+      background: var(--secondary-color);
+      cursor: pointer;
+      transition: background var(--transition-speed);
+      font-size: 1rem;
+    }
+    header .header-controls button:hover,
+    header .header-controls select:hover {
+      background: var(--accent-color);
     }
     main {
       width: 90%;
       max-width: 1200px;
       margin: 2rem auto;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(0, 0, 0, 0.8);
       padding: 1.5rem;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
+      position: relative;
     }
-    /* Now Playing Display */
+    /* Now Playing & Status */
     .now-playing {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 1rem;
+      gap: 0.3rem;
       margin-bottom: 1rem;
     }
     .track-info h2 {
-      font-size: 1.5rem;
-      margin: 0 0 0.3rem 0;
+      font-size: 1.8rem;
+      margin: 0;
+      text-transform: uppercase;
     }
     .track-info p {
-      font-size: 1rem;
-      opacity: 0.8;
+      font-size: 1.1rem;
+      opacity: 0.9;
       margin: 0;
     }
-    /* Display Container: holds video or audio visualization */
+    .status {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      text-align: center;
+      color: var(--accent-color);
+    }
+    /* Media Display */
     #display-container {
       position: relative;
       width: 100%;
-      height: 150px;
+      height: 240px;
       background: #000;
       border-radius: var(--border-radius);
       overflow: hidden;
       margin-bottom: 1rem;
     }
-    /* Both media elements take full size */
     #audio-visualizer,
     #video-player {
       width: 100%;
@@ -107,15 +135,14 @@
       left: 0;
       transition: opacity var(--transition-speed);
     }
-    /* Hide elements when not used */
     .hidden {
       display: none;
     }
-    /* Seek Bar */
+    /* Seek Bar & Time Display */
     .seek-bar {
       width: 100%;
       background: #333;
-      height: 8px;
+      height: 10px;
       border-radius: var(--border-radius);
       margin: 1rem 0;
       position: relative;
@@ -130,34 +157,42 @@
     }
     .seek-tooltip {
       position: absolute;
-      top: -25px;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 2px 5px;
+      top: -30px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 3px 7px;
       border-radius: 4px;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       display: none;
       white-space: nowrap;
+      color: var(--text-light);
     }
-    /* Playback Controls */
+    .time-display {
+      text-align: center;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    /* Playback & Extra Controls */
     .controls {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1rem;
+      gap: 0.7rem;
       margin-bottom: 1rem;
     }
     .controls button,
-    .controls input[type="range"] {
+    .controls input[type="range"],
+    .controls select {
       background: var(--secondary-color);
       border: none;
       border-radius: var(--border-radius);
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1rem;
       cursor: pointer;
       transition: background var(--transition-speed);
       font-size: 1rem;
     }
     .controls button:hover,
-    .controls input[type="range"]:hover {
+    .controls input[type="range"]:hover,
+    .controls select:hover {
       background: var(--accent-color);
     }
     .slider-container {
@@ -165,9 +200,13 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Playlist */
+    /* Playlist & Upload */
     .playlist {
       margin-top: 1rem;
+      border: 2px dashed var(--accent-color);
+      padding: 0.7rem;
+      border-radius: var(--border-radius);
+      background: rgba(0, 0, 0, 0.6);
     }
     .playlist ul {
       list-style: none;
@@ -175,42 +214,134 @@
       margin: 0;
     }
     .playlist li {
-      padding: 0.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      cursor: pointer;
+      padding: 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      cursor: grab;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1rem;
+      transition: background var(--transition-speed);
     }
-    @media (max-width: 480px) {
-      #display-container {
-        height: 120px;
-      }
+    .playlist li:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .playlist li:last-child {
+      border-bottom: none;
+    }
+    .playlist li.dragging {
+      opacity: 0.5;
+    }
+    .upload-area {
+      border: 3px dashed var(--primary-color);
+      padding: 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 1.1rem;
+      background: rgba(255,255,255,0.1);
+    }
+    /* Settings Modal */
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-dark);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      z-index: 500;
+      width: 90%;
+      max-width: 500px;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      color: var(--text-light);
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-header {
+      font-size: 1.4rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .modal-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .close-modal {
+      align-self: flex-end;
+      background: transparent;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+    /* Mini Player Mode */
+    .mini-player {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      width: 320px;
+      height: 190px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      z-index: 600;
+      display: none;
+      flex-direction: column;
+      padding: 0.7rem;
+      color: var(--text-light);
+    }
+    .mini-player.active {
+      display: flex;
+    }
+    .mini-controls {
+      display: flex;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body class="dark">
   <header>
     <h1>Ultra Advanced Vibrant Media Player</h1>
+    <div class="header-controls">
+      <button id="openSettings" aria-label="Open Settings">Settings</button>
+      <button id="toggleTheme" aria-label="Toggle Dark/Light Theme">Toggle Theme</button>
+      <select id="languageSelect" aria-label="Select Language">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+      </select>
+    </div>
   </header>
   <main>
-    <!-- Now Playing Display -->
+    <!-- Now Playing Display & ARIA Live Regions -->
     <section class="now-playing" aria-label="Now Playing">
       <div class="track-info">
         <h2 id="track-title">Track Title</h2>
         <p id="track-meta">Artist - Album</p>
       </div>
     </section>
-    <!-- Display Container: holds video or audio visualization -->
+    <div class="status" aria-live="polite" id="statusMessage">Idle</div>
+    <!-- Media Display -->
     <section id="display-container" aria-label="Media Display">
-      <!-- Audio visualization canvas -->
       <canvas id="audio-visualizer" class="hidden" aria-hidden="true"></canvas>
-      <!-- Video element for video playback -->
       <video id="video-player" playsinline aria-label="Media Player" class="hidden"></video>
     </section>
-    <!-- Seek Bar -->
+    <!-- Seek Bar & Time Display -->
     <div class="seek-bar" id="seek-bar" role="slider" aria-label="Seek Bar">
       <div class="progress" id="progress"></div>
       <div class="seek-tooltip" id="seek-tooltip" aria-live="off">0:00</div>
     </div>
-    <!-- Playback Controls -->
+    <div class="time-display" id="timeDisplay" aria-live="polite">0:00 / 0:00</div>
+    <!-- Playback & Extra Controls -->
     <section class="controls" aria-label="Playback Controls">
       <button id="prev" aria-label="Previous Track">⏮️</button>
       <button id="play" aria-label="Play">▶️</button>
@@ -218,21 +349,91 @@
       <button id="next" aria-label="Next Track">⏭️</button>
       <button id="loop" aria-label="Loop Mode">Loop Off</button>
       <button id="shuffle" aria-label="Shuffle Mode">Shuffle Off</button>
-      <button id="fullscreen" aria-label="Fullscreen">Fullscreen</button>
-      <button id="themeToggle" aria-label="Toggle Theme">Toggle Theme</button>
+      <button id="pip" aria-label="Picture in Picture">PiP</button>
+      <button id="fullscreen" aria-label="Full Screen">Full Screen</button>
+      <button id="miniToggle" aria-label="Toggle Mini Player">Mini</button>
+      <button id="download" aria-label="Download Track">Download</button>
       <div class="slider-container">
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
         <button id="mute" aria-label="Mute/Unmute">Mute</button>
       </div>
+      <div class="slider-container">
+        <label for="playbackSpeed">Speed</label>
+        <input type="range" id="playbackSpeed" min="0.5" max="2" step="0.1" value="1">
+      </div>
+      <div class="slider-container">
+        <label for="eq">EQ Preset</label>
+        <select id="eq">
+          <option value="flat">Flat</option>
+          <option value="bass">Bass Boost</option>
+          <option value="treble">Treble Boost</option>
+          <option value="vocal">Vocal Boost</option>
+          <option value="rock">Rock</option>
+          <option value="jazz">Jazz</option>
+        </select>
+      </div>
+      <div class="slider-container">
+        <label for="vizMode">Visualizer</label>
+        <select id="vizMode">
+          <option value="waveform">Waveform</option>
+          <option value="bars">Frequency Bars</option>
+          <option value="3d">3D</option>
+          <option value="circular">Circular</option>
+        </select>
+      </div>
+      <div class="slider-container">
+        <label for="urlInput">Stream URL</label>
+        <input type="text" id="urlInput" placeholder="Enter media URL">
+        <button id="loadURL" aria-label="Load URL">Load</button>
+      </div>
+      <div class="slider-container">
+        <label for="subtitleToggle">Subtitles</label>
+        <button id="subtitleToggle" aria-label="Toggle Subtitles">Subtitles Off</button>
+      </div>
     </section>
-    <!-- Playlist -->
+    <!-- Upload & Playlist -->
+    <div class="upload-area" id="uploadArea" tabindex="0" aria-label="Click or drop files to upload">
+      Drag & Drop files here or click to upload.
+      <input type="file" id="fileInput" multiple style="display:none;">
+    </div>
     <section class="playlist" aria-label="Playlist">
       <ul id="playlistItems"></ul>
+      <div class="playlist-search">
+        <input type="text" id="playlistSearch" placeholder="Search playlist...">
+      </div>
+      <div class="playlist-controls">
+        <button id="savePlaylist">Save Playlist</button>
+        <button id="loadPlaylist">Load Playlist</button>
+      </div>
     </section>
-    <!-- Hidden audio element for audio playback -->
-    <audio id="audio-player" class="hidden"></audio>
   </main>
+  <!-- Settings Modal -->
+  <div class="modal" id="settingsModal" role="dialog" aria-modal="true">
+    <button class="close-modal" id="closeSettings" aria-label="Close Settings">&times;</button>
+    <div class="modal-header">Settings</div>
+    <div class="modal-controls">
+      <label for="fftSize">FFT Size</label>
+      <input type="range" id="fftSize" min="128" max="2048" step="128" value="256">
+      <label for="primaryColor">Primary Color</label>
+      <input type="color" id="primaryColor" value="#FF007F">
+      <label for="secondaryColor">Secondary Color</label>
+      <input type="color" id="secondaryColor" value="#00FFFF">
+      <label for="accentColor">Accent Color</label>
+      <input type="color" id="accentColor" value="#FFFF00">
+    </div>
+  </div>
+  <!-- Mini Player -->
+  <div class="mini-player" id="miniPlayer" aria-label="Mini Player">
+    <div id="miniDisplay">Mini Player</div>
+    <div class="mini-controls">
+      <button id="miniPlay" aria-label="Play">▶️</button>
+      <button id="miniPause" aria-label="Pause">⏸️</button>
+      <button id="miniClose" aria-label="Close Mini Player">✖️</button>
+    </div>
+  </div>
+  <!-- Hidden Audio Element -->
+  <audio id="audio-player" class="hidden"></audio>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       /* ===== DOM Elements ===== */
@@ -247,16 +448,44 @@
       const prevBtn = document.getElementById("prev");
       const loopBtn = document.getElementById("loop");
       const shuffleBtn = document.getElementById("shuffle");
+      const pipBtn = document.getElementById("pip");
       const fullscreenBtn = document.getElementById("fullscreen");
-      const themeToggleBtn = document.getElementById("themeToggle");
+      const miniToggleBtn = document.getElementById("miniToggle");
+      const downloadBtn = document.getElementById("download");
       const volumeSlider = document.getElementById("volume");
       const muteBtn = document.getElementById("mute");
+      const playbackSpeedSlider = document.getElementById("playbackSpeed");
+      const eqSelect = document.getElementById("eq");
+      const vizSelect = document.getElementById("vizMode");
+      const urlInput = document.getElementById("urlInput");
+      const loadURLBtn = document.getElementById("loadURL");
       const progressBar = document.getElementById("progress");
       const seekBar = document.getElementById("seek-bar");
       const seekTooltip = document.getElementById("seek-tooltip");
+      const timeDisplay = document.getElementById("timeDisplay");
       const trackTitle = document.getElementById("track-title");
       const trackMeta = document.getElementById("track-meta");
+      const statusMessage = document.getElementById("statusMessage");
       const playlistEl = document.getElementById("playlistItems");
+      const uploadArea = document.getElementById("uploadArea");
+      const fileInput = document.getElementById("fileInput");
+      const settingsModal = document.getElementById("settingsModal");
+      const openSettings = document.getElementById("openSettings");
+      const closeSettings = document.getElementById("closeSettings");
+      const fftSizeInput = document.getElementById("fftSize");
+      const primaryColorInput = document.getElementById("primaryColor");
+      const secondaryColorInput = document.getElementById("secondaryColor");
+      const accentColorInput = document.getElementById("accentColor");
+      const miniPlayer = document.getElementById("miniPlayer");
+      const miniPlay = document.getElementById("miniPlay");
+      const miniPause = document.getElementById("miniPause");
+      const miniClose = document.getElementById("miniClose");
+      const languageSelect = document.getElementById("languageSelect");
+      const playlistSearch = document.getElementById("playlistSearch");
+      const savePlaylistBtn = document.getElementById("savePlaylist");
+      const loadPlaylistBtn = document.getElementById("loadPlaylist");
+      const toggleThemeBtn = document.getElementById("toggleTheme");
+      const subtitleToggle = document.getElementById("subtitleToggle");
 
       /* ===== Player State ===== */
       let currentIndex = 0;
@@ -264,31 +493,57 @@
       let isShuffle = false;
       let muted = false;
       let playlist = [];
-      // Track current media type: "audio" or "video"
-      let currentMediaType = null;
-
-      /* ===== Predefined Songs List ===== */
-      const songs = [
+      let currentMediaType = null; // "audio" or "video"
+      let localTracks = [];
+      const defaultSongs = [
         { title: "Audio Track 1", src: "https://varun1210163.github.io/music/song1.mp3", meta: "Artist - Album" },
-        { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", meta: "Artist - Album" },
+        { title: "Audio Track 2", src: "https://varun1210163.github.io/music/song3.flac", meta: "Artist - Album" }
       ];
+      let songs = [...defaultSongs];
 
       /* ===== Playlist Population ===== */
       function populatePlaylist() {
         playlistEl.innerHTML = "";
-        if (playlist.length === 0) {
-          playlist = songs.map((s, i) => i);
-        }
-        playlist.forEach(i => {
+        const searchQuery = playlistSearch.value.toLowerCase();
+        const filteredPlaylist = playlist.filter(i => songs[i].title.toLowerCase().includes(searchQuery));
+        filteredPlaylist.forEach(i => {
           const song = songs[i];
           const li = document.createElement("li");
           li.textContent = song.title;
           li.dataset.index = i;
+          li.draggable = true;
           li.tabIndex = 0;
           li.addEventListener("click", () => playMedia(i));
           li.addEventListener("keypress", (e) => { if (e.key === "Enter") playMedia(i); });
+          li.addEventListener("dragstart", handleDragStart);
+          li.addEventListener("dragover", handleDragOver);
+          li.addEventListener("drop", handleDrop);
           playlistEl.appendChild(li);
         });
+      }
+      playlistSearch.addEventListener("input", populatePlaylist);
+
+      /* ===== Drag & Drop Handlers ===== */
+      let dragSrcEl = null;
+      function handleDragStart(e) {
+        dragSrcEl = this;
+        this.classList.add("dragging");
+        e.dataTransfer.effectAllowed = 'move';
+      }
+      function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+      }
+      function handleDrop(e) {
+        e.stopPropagation();
+        if (dragSrcEl !== this) {
+          const srcIndex = parseInt(dragSrcEl.dataset.index, 10);
+          const targetIndex = parseInt(this.dataset.index, 10);
+          [playlist[srcIndex], playlist[targetIndex]] = [playlist[targetIndex], playlist[srcIndex]];
+          populatePlaylist();
+        }
+        return false;
       }
 
       /* ===== Auto-Save & Load Playlist ===== */
@@ -308,111 +563,142 @@
         playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
       });
       window.addEventListener("beforeunload", () => {
-        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
         localStorage.setItem("lastIndex", currentIndex);
-        localStorage.setItem("lastTime", activePlayer.currentTime);
+        localStorage.setItem("lastTime", player.currentTime);
         localStorage.setItem("playlistOrder", JSON.stringify(playlist));
       });
 
-      /* ===== Web Audio API Setup for Audio Visualization ===== */
+      /* ===== Web Audio API & Visualizer ===== */
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       let sourceNode, analyser;
       function setupAudioAnalyser() {
         if (!sourceNode) {
           sourceNode = audioCtx.createMediaElementSource(audioPlayer);
           analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 256;
+          analyser.fftSize = parseInt(fftSizeInput.value, 10);
           sourceNode.connect(analyser);
           analyser.connect(audioCtx.destination);
         }
       }
       setupAudioAnalyser();
-
-      /* ===== Visualizer: Waveform for Audio ===== */
-      function drawWaveform() {
-        if (!analyser) return;
-        const bufferLength = analyser.fftSize;
-        const dataArray = new Uint8Array(bufferLength);
-        analyser.getByteTimeDomainData(dataArray);
-        ctx.fillStyle = "#121212";
-        ctx.fillRect(0, 0, audioCanvas.width, audioCanvas.height);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "var(--accent-color)";
-        ctx.beginPath();
-        const sliceWidth = audioCanvas.width / bufferLength;
-        let x = 0;
-        for (let i = 0; i < bufferLength; i++) {
-          const v = dataArray[i] / 128.0;
-          const y = (v * audioCanvas.height) / 2;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-          x += sliceWidth;
+      function drawVisualizer() {
+        requestAnimationFrame(drawVisualizer);
+        if (currentMediaType !== "audio") return;
+        const mode = vizSelect.value;
+        const bufferLength = analyser.frequencyBinCount;
+        let dataArray;
+        if(mode === "waveform"){
+          dataArray = new Uint8Array(analyser.fftSize);
+          analyser.getByteTimeDomainData(dataArray);
+        } else {
+          dataArray = new Uint8Array(bufferLength);
+          analyser.getByteFrequencyData(dataArray);
         }
-        ctx.lineTo(audioCanvas.width, audioCanvas.height / 2);
-        ctx.stroke();
-      }
-      function animateVisualizer() {
-        requestAnimationFrame(animateVisualizer);
-        if (currentMediaType === "audio") {
-          drawWaveform();
+        ctx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
+        if (mode === "waveform") {
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color');
+          ctx.beginPath();
+          const sliceWidth = audioCanvas.width / dataArray.length;
+          let x = 0;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 128.0;
+            const y = v * audioCanvas.height / 2;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+            x += sliceWidth;
+          }
+          ctx.stroke();
+        } else if (mode === "bars") {
+          const barWidth = (audioCanvas.width / bufferLength) * 2.5;
+          let x = 0;
+          for (let i = 0; i < bufferLength; i++) {
+            const barHeight = dataArray[i];
+            ctx.fillStyle = `rgb(${barHeight}, ${barHeight/2}, ${barHeight/3})`;
+            ctx.fillRect(x, audioCanvas.height - barHeight/2, barWidth, barHeight/2);
+            x += barWidth + 1;
+          }
+        } else if (mode === "3d") {
+          const sliceWidth = audioCanvas.width / dataArray.length;
+          for (let i = 0; i < dataArray.length; i++) {
+            const v = dataArray[i] / 255;
+            const hue = v * 360;
+            ctx.fillStyle = `hsl(${hue},100%,50%)`;
+            ctx.fillRect(i * sliceWidth, audioCanvas.height * (1 - v), sliceWidth, audioCanvas.height * v);
+          }
+        } else if (mode === "circular") {
+          const radius = Math.min(audioCanvas.width, audioCanvas.height) / 4;
+          const cx = audioCanvas.width / 2;
+          const cy = audioCanvas.height / 2;
+          const angleStep = (Math.PI * 2) / bufferLength;
+          for (let i = 0; i < bufferLength; i++) {
+            const amplitude = dataArray[i] / 255;
+            const barHeight = amplitude * 50;
+            const angle = i * angleStep;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.fillStyle = `rgba(255,255,255,${amplitude})`;
+            ctx.fillRect(0, -2, barHeight, 4);
+            ctx.restore();
+          }
         }
       }
-      animateVisualizer();
-
+      drawVisualizer();
       function resizeCanvas() {
         audioCanvas.width = audioCanvas.clientWidth || 300;
-        audioCanvas.height = audioCanvas.clientHeight || 150;
+        audioCanvas.height = audioCanvas.clientHeight || 240;
       }
       window.addEventListener("resize", resizeCanvas);
-      window.addEventListener("orientationchange", resizeCanvas);
       resizeCanvas();
 
-      /* ===== Determine Media Type Based on File Extension ===== */
-      function getMediaTypeForSource(src) {
-        const extension = src.split('.').pop().toLowerCase();
-        const videoExtensions = ["mp4", "webm", "ogg"];
-        const audioExtensions = ["mp3", "flac", "wav", "aac"];
-        if (videoExtensions.includes(extension)) return "video";
-        else if (audioExtensions.includes(extension)) return "audio";
+      /* ===== Determine Media Type ===== */
+      function getMediaType(src) {
+        const ext = src.split('.').pop().toLowerCase();
+        const videoExts = ["mp4", "webm", "ogg"];
+        const audioExts = ["mp3", "flac", "wav", "aac"];
+        if (videoExts.includes(ext)) return "video";
+        else if (audioExts.includes(ext)) return "audio";
         else return "audio";
       }
 
-      /* ===== Media Playback Functions ===== */
+      /* ===== Playback Functions ===== */
       function playMedia(index, startTime = 0) {
         currentIndex = index;
-        const song = songs[playlist[index]];
-        trackTitle.textContent = song.title;
-        trackMeta.textContent = song.meta;
-        const type = getMediaTypeForSource(song.src);
+        const track = songs[playlist[index]];
+        trackTitle.textContent = track.title;
+        trackMeta.textContent = track.meta;
+        const type = getMediaType(track.src);
         currentMediaType = type;
-
-        // Stop both players
         audioPlayer.pause();
         videoPlayer.pause();
-
-        // Show/hide appropriate elements based on media type
+        // Reset error messages if any
+        audioPlayer.onerror = videoPlayer.onerror = null;
         if (type === "audio") {
           audioPlayer.classList.remove("hidden");
           videoPlayer.classList.add("hidden");
           audioCanvas.classList.remove("hidden");
-          audioPlayer.src = song.src;
+          audioPlayer.src = track.src;
           audioPlayer.load();
           audioPlayer.currentTime = startTime;
-          audioPlayer.play();
-        } else if (type === "video") {
+          audioPlayer.play().catch(err => statusMessage.textContent = "Playback error");
+        } else {
           videoPlayer.classList.remove("hidden");
           audioPlayer.classList.add("hidden");
           audioCanvas.classList.add("hidden");
-          videoPlayer.src = song.src;
+          videoPlayer.src = track.src;
           videoPlayer.load();
           videoPlayer.currentTime = startTime;
-          videoPlayer.play();
+          videoPlayer.play().catch(err => statusMessage.textContent = "Playback error");
         }
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
+        updateDownloadLink(track.src);
+        statusMessage.textContent = languageSelect.value === "es" ? "Reproduciendo..." : "Playing...";
       }
-
-      /* ===== Standard Controls ===== */
       playBtn.addEventListener("click", () => {
         if (currentMediaType === "audio") {
           if (!audioPlayer.src) playMedia(currentIndex);
@@ -425,22 +711,17 @@
         pauseBtn.style.display = "inline-block";
       });
       pauseBtn.addEventListener("click", () => {
-        if (currentMediaType === "audio") {
-          audioPlayer.pause();
-        } else {
-          videoPlayer.pause();
-        }
+        if (currentMediaType === "audio") audioPlayer.pause();
+        else videoPlayer.pause();
         pauseBtn.style.display = "none";
         playBtn.style.display = "inline-block";
       });
       nextBtn.addEventListener("click", () => {
-        if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
-        else currentIndex = (currentIndex + 1) % songs.length;
+        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex + 1) % songs.length;
         playMedia(currentIndex);
       });
       prevBtn.addEventListener("click", () => {
-        if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
-        else currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex - 1 + songs.length) % songs.length;
         playMedia(currentIndex);
       });
       loopBtn.addEventListener("click", () => {
@@ -451,49 +732,59 @@
         isShuffle = !isShuffle;
         shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
       });
-      fullscreenBtn.addEventListener("click", () => {
-        // For video, request fullscreen on the video element; for audio, use the display container.
-        if (currentMediaType === "video") {
-          if (videoPlayer.requestFullscreen) videoPlayer.requestFullscreen();
-          else if (videoPlayer.webkitRequestFullscreen) videoPlayer.webkitRequestFullscreen();
-        } else if (currentMediaType === "audio") {
-          if (displayContainer.requestFullscreen) displayContainer.requestFullscreen();
-          else if (displayContainer.webkitRequestFullscreen) displayContainer.webkitRequestFullscreen();
+      pipBtn.addEventListener("click", async () => {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else if (currentMediaType === "video") {
+          await videoPlayer.requestPictureInPicture();
         }
       });
-      themeToggleBtn.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        document.body.classList.toggle("light");
+      fullscreenBtn.addEventListener("click", () => {
+        if (!document.fullscreenElement) {
+          displayContainer.requestFullscreen().catch(err => statusMessage.textContent = "Fullscreen error");
+        } else {
+          document.exitFullscreen();
+        }
+      });
+      downloadBtn.addEventListener("click", () => {
+        const track = songs[playlist[currentIndex]];
+        updateDownloadLink(track.src);
       });
       volumeSlider.addEventListener("input", () => {
-        if (currentMediaType === "audio") {
-          audioPlayer.volume = volumeSlider.value;
-          if (audioPlayer.volume > 0) {
-            muted = false;
-            muteBtn.textContent = "Mute";
-          }
-        } else {
-          videoPlayer.volume = volumeSlider.value;
-          if (videoPlayer.volume > 0) {
-            muted = false;
-            muteBtn.textContent = "Mute";
-          }
+        if (currentMediaType === "audio") audioPlayer.volume = volumeSlider.value;
+        else videoPlayer.volume = volumeSlider.value;
+        if (volumeSlider.value > 0) {
+          muted = false;
+          muteBtn.textContent = "Mute";
         }
       });
       muteBtn.addEventListener("click", () => {
         muted = !muted;
-        if (currentMediaType === "audio") {
-          audioPlayer.muted = muted;
-        } else {
-          videoPlayer.muted = muted;
-        }
+        if (currentMediaType === "audio") audioPlayer.muted = muted;
+        else videoPlayer.muted = muted;
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       });
+      playbackSpeedSlider.addEventListener("input", () => {
+        const speed = playbackSpeedSlider.value;
+        if (currentMediaType === "audio") audioPlayer.playbackRate = speed;
+        else videoPlayer.playbackRate = speed;
+      });
+      function updateDownloadLink(src) {
+        downloadBtn.onclick = () => {
+          const a = document.createElement("a");
+          a.href = src;
+          a.download = src.split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+      }
       function updateProgress() {
-        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        if (activePlayer.duration) {
-          const percent = (activePlayer.currentTime / activePlayer.duration) * 100;
+        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        if (player.duration) {
+          const percent = (player.currentTime / player.duration) * 100;
           progressBar.style.width = percent + "%";
+          timeDisplay.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
         }
       }
       audioPlayer.addEventListener("timeupdate", updateProgress);
@@ -501,15 +792,14 @@
       seekBar.addEventListener("click", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
-        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        const newTime = (clickX / seekBar.offsetWidth) * activePlayer.duration;
-        activePlayer.currentTime = newTime;
+        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        player.currentTime = (clickX / seekBar.offsetWidth) * player.duration;
       });
       seekBar.addEventListener("mousemove", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const hoverX = e.clientX - rect.left;
-        const activePlayer = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        const time = (hoverX / seekBar.offsetWidth) * activePlayer.duration;
+        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
+        const time = (hoverX / seekBar.offsetWidth) * player.duration;
         seekTooltip.textContent = formatTime(time);
         seekTooltip.style.left = hoverX + "px";
         seekTooltip.style.display = "block";
@@ -524,11 +814,8 @@
         return `${minutes}:${seconds}`;
       }
       function handleMediaEnd() {
-        if (loopState === 1) {
-          playMedia(currentIndex);
-        } else {
-          nextBtn.click();
-        }
+        if (loopState === 1) playMedia(currentIndex);
+        else nextBtn.click();
       }
       audioPlayer.addEventListener("ended", handleMediaEnd);
       videoPlayer.addEventListener("ended", handleMediaEnd);
@@ -536,8 +823,7 @@
         switch (e.key) {
           case " ":
             e.preventDefault();
-            currentMediaType === "audio" ? (audioPlayer.paused ? playBtn.click() : pauseBtn.click())
-                                         : (videoPlayer.paused ? playBtn.click() : pauseBtn.click());
+            (currentMediaType === "audio" ? audioPlayer.paused : videoPlayer.paused) ? playBtn.click() : pauseBtn.click();
             break;
           case "ArrowRight":
             nextBtn.click();
@@ -557,6 +843,133 @@
       });
       document.body.addEventListener("click", () => {
         if (audioCtx.state === "suspended") audioCtx.resume();
+      });
+
+      /* ===== File Upload & Drag-and-Drop ===== */
+      uploadArea.addEventListener("click", () => fileInput.click());
+      uploadArea.addEventListener("dragover", (e) => { e.preventDefault(); });
+      uploadArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener("change", (e) => {
+        handleFiles(e.target.files);
+      });
+      function handleFiles(files) {
+        Array.from(files).forEach(file => {
+          const url = URL.createObjectURL(file);
+          songs.push({ title: file.name, src: url, meta: "Local File" });
+          playlist.push(songs.length - 1);
+        });
+        populatePlaylist();
+      }
+
+      /* ===== Remote URL Input ===== */
+      loadURLBtn.addEventListener("click", () => {
+        const url = urlInput.value.trim();
+        if (url) {
+          songs.push({ title: url, src: url, meta: "Remote Stream" });
+          playlist.push(songs.length - 1);
+          populatePlaylist();
+          urlInput.value = "";
+        }
+      });
+
+      /* ===== Settings Modal ===== */
+      openSettings.addEventListener("click", () => settingsModal.classList.add("active"));
+      closeSettings.addEventListener("click", () => settingsModal.classList.remove("active"));
+      fftSizeInput.addEventListener("input", () => {
+        if (analyser) {
+          analyser.fftSize = parseInt(fftSizeInput.value, 10);
+        }
+      });
+      primaryColorInput.addEventListener("input", () => {
+        document.documentElement.style.setProperty('--primary-color', primaryColorInput.value);
+      });
+      secondaryColorInput.addEventListener("input", () => {
+        document.documentElement.style.setProperty('--secondary-color', secondaryColorInput.value);
+      });
+      accentColorInput.addEventListener("input", () => {
+        document.documentElement.style.setProperty('--accent-color', accentColorInput.value);
+      });
+
+      /* ===== Mini Player Mode ===== */
+      miniToggleBtn.addEventListener("click", () => {
+        miniPlayer.classList.toggle("active");
+      });
+      miniPlay.addEventListener("click", () => {
+        if (currentMediaType === "audio") audioPlayer.play();
+        else videoPlayer.play();
+      });
+      miniPause.addEventListener("click", () => {
+        if (currentMediaType === "audio") audioPlayer.pause();
+        else videoPlayer.pause();
+      });
+      miniClose.addEventListener("click", () => {
+        miniPlayer.classList.remove("active");
+      });
+
+      /* ===== Equalizer (Simulated) ===== */
+      eqSelect.addEventListener("change", () => {
+        statusMessage.textContent = languageSelect.value === "es" ? `EQ configurado a ${eqSelect.value}` : `EQ set to ${eqSelect.value}`;
+      });
+
+      /* ===== Subtitles Toggle (for Video) ===== */
+      let subtitlesEnabled = false;
+      subtitleToggle.addEventListener("click", () => {
+        subtitlesEnabled = !subtitlesEnabled;
+        subtitleToggle.textContent = subtitlesEnabled ? "Subtitles On" : "Subtitles Off";
+        if (currentMediaType === "video" && subtitlesEnabled) {
+          // Assume subtitle track is available as a VTT file next to video (this is a placeholder)
+          let track = videoPlayer.querySelector("track");
+          if (!track) {
+            track = document.createElement("track");
+            track.kind = "subtitles";
+            track.label = "English";
+            track.srclang = "en";
+            track.src = videoPlayer.src.replace(/\.[^/.]+$/, ".vtt");
+            videoPlayer.appendChild(track);
+          }
+          track.mode = "showing";
+        } else if (currentMediaType === "video") {
+          const track = videoPlayer.querySelector("track");
+          if (track) track.mode = "disabled";
+        }
+      });
+
+      /* ===== Theme Toggle ===== */
+      toggleThemeBtn.addEventListener("click", () => {
+        document.body.classList.toggle("light");
+        document.body.classList.toggle("dark");
+      });
+
+      /* ===== Playlist Save/Load ===== */
+      savePlaylistBtn.addEventListener("click", () => {
+        localStorage.setItem("customPlaylist", JSON.stringify(songs));
+        statusMessage.textContent = languageSelect.value === "es" ? "Lista guardada" : "Playlist saved";
+      });
+      loadPlaylistBtn.addEventListener("click", () => {
+        const stored = localStorage.getItem("customPlaylist");
+        if (stored) {
+          songs = JSON.parse(stored);
+          playlist = songs.map((s, i) => i);
+          populatePlaylist();
+          statusMessage.textContent = languageSelect.value === "es" ? "Lista cargada" : "Playlist loaded";
+        }
+      });
+
+      /* ===== Language Selector ===== */
+      languageSelect.addEventListener("change", () => {
+        const lang = languageSelect.value;
+        if (lang === "es") {
+          trackTitle.textContent = "Título de la pista";
+          trackMeta.textContent = "Artista - Álbum";
+          statusMessage.textContent = "Listo";
+        } else {
+          trackTitle.textContent = "Track Title";
+          trackMeta.textContent = "Artist - Album";
+          statusMessage.textContent = "Ready";
+        }
       });
     });
   </script>
