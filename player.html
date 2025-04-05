@@ -179,7 +179,21 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Playlist & Upload */
+    /* Upload, Local Scan & Playlist */
+    .upload-area {
+      border: 3px dashed var(--primary-color);
+      padding: 1.2rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 1.1rem;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .local-scan {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
     .playlist {
       margin-top: 1rem;
       border: 2px dashed var(--accent-color);
@@ -210,16 +224,6 @@
     }
     .playlist li.dragging {
       opacity: 0.5;
-    }
-    .upload-area {
-      border: 3px dashed var(--primary-color);
-      padding: 1.2rem;
-      text-align: center;
-      margin-bottom: 1rem;
-      border-radius: var(--border-radius);
-      cursor: pointer;
-      font-size: 1.1rem;
-      background: rgba(255, 255, 255, 0.1);
     }
     /* Mini Player Mode */
     .mini-player {
@@ -318,11 +322,16 @@
         <button id="subtitleToggle" aria-label="Toggle Subtitles">Subtitles Off</button>
       </div>
     </section>
-    <!-- Upload & Playlist -->
+    <!-- Upload Area -->
     <div class="upload-area" id="uploadArea" tabindex="0" aria-label="Click or drop files to upload">
       Drag & Drop files here or click to upload.
       <input type="file" id="fileInput" multiple style="display:none;">
     </div>
+    <!-- Local Storage Scan Button -->
+    <div class="local-scan">
+      <button id="scanLocal" aria-label="Scan Local Media">Scan Local Media</button>
+    </div>
+    <!-- Playlist -->
     <section class="playlist" aria-label="Playlist">
       <ul id="playlistItems"></ul>
       <div class="playlist-search">
@@ -382,6 +391,7 @@
       const savePlaylistBtn = document.getElementById("savePlaylist");
       const loadPlaylistBtn = document.getElementById("loadPlaylist");
       const subtitleToggle = document.getElementById("subtitleToggle");
+      const scanLocalBtn = document.getElementById("scanLocal");
 
       /* ===== Player State ===== */
       let currentIndex = 0;
@@ -793,6 +803,36 @@
           statusMessage.textContent = "Playlist loaded";
         }
       });
+
+      /* ===== Scan Local Media Feature ===== */
+      if (window.showDirectoryPicker) {
+        scanLocalBtn.addEventListener("click", async () => {
+          try {
+            const dirHandle = await window.showDirectoryPicker();
+            for await (const entry of dirHandle.values()) {
+              if (entry.kind === "file") {
+                const fileName = entry.name;
+                const ext = fileName.split('.').pop().toLowerCase();
+                const audioExts = ["mp3", "flac", "wav", "aac"];
+                const videoExts = ["mp4", "webm", "ogg"];
+                if (audioExts.includes(ext) || videoExts.includes(ext)) {
+                  const file = await entry.getFile();
+                  const url = URL.createObjectURL(file);
+                  songs.push({ title: fileName, src: url, meta: "Local File" });
+                  playlist.push(songs.length - 1);
+                }
+              }
+            }
+            populatePlaylist();
+            statusMessage.textContent = "Local media scanned and added.";
+          } catch (err) {
+            statusMessage.textContent = "Failed to access local media: " + err.message;
+          }
+        });
+      } else {
+        scanLocalBtn.style.display = "none";
+        statusMessage.textContent = "Local directory access not supported in this browser.";
+      }
     });
   </script>
 </body>
