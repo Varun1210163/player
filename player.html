@@ -274,6 +274,24 @@
       gap: 0.6rem;
       margin-top: 0.5rem;
     }
+    /* Scan Local Media Button (Footer) */
+    .footer-scan {
+      margin: 2rem 0;
+      text-align: center;
+    }
+    .footer-scan button {
+      background: var(--secondary-color);
+      color: var(--text-dark);
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+    .footer-scan button:hover {
+      background: var(--accent-color);
+    }
   </style>
 </head>
 <body class="dark">
@@ -341,8 +359,6 @@
         <input type="text" id="urlInput" placeholder="Enter media URL">
         <button id="loadURL" aria-label="Load URL">Load</button>
       </div>
-      <!-- REPLACED SUBTITLE CONTROL WITH SCAN LOCAL MEDIA BUTTON -->
-      <button id="scanLocal" aria-label="Scan Local Media">Scan Local Media</button>
     </section>
     <!-- Upload Area -->
     <div class="upload-area" id="uploadArea" tabindex="0" aria-label="Click or drop files to upload">
@@ -360,6 +376,10 @@
         <button id="loadPlaylist">Load Playlist</button>
       </div>
     </section>
+    <!-- Scan Local Media Button (Footer) -->
+    <div class="footer-scan">
+      <button id="scanLocal" aria-label="Scan Local Media">Scan Local Media</button>
+    </div>
   </main>
   <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer" aria-label="Mini Player">
