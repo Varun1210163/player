@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -179,7 +180,7 @@
       align-items: center;
       gap: 0.5rem;
     }
-    /* Upload, Local Scan & Playlist */
+    /* Upload & Local Scan */
     .upload-area {
       border: 3px dashed var(--primary-color);
       padding: 1.2rem;
@@ -194,6 +195,20 @@
       text-align: center;
       margin-bottom: 1rem;
     }
+    .local-scan button {
+      background: var(--secondary-color);
+      color: var(--text-dark);
+      padding: 0.7rem 1.2rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+    .local-scan button:hover {
+      background: var(--accent-color);
+    }
+    /* Playlist & Playlist Controls */
     .playlist {
       margin-top: 1rem;
       border: 2px dashed var(--accent-color);
@@ -224,6 +239,33 @@
     }
     .playlist li.dragging {
       opacity: 0.5;
+    }
+    .playlist-search,
+    .playlist-controls {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .playlist-search input {
+      padding: 0.5rem;
+      border-radius: var(--border-radius);
+      border: none;
+      font-size: 1rem;
+    }
+    .playlist-controls button {
+      background: var(--secondary-color);
+      color: var(--text-dark);
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background var(--transition-speed);
+    }
+    .playlist-controls button:hover {
+      background: var(--accent-color);
     }
     /* Mini Player Mode */
     .mini-player {
