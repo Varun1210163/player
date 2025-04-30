@@ -7,10 +7,11 @@
   <meta name="description" content="A vibrant, ultra advanced media player supporting local uploads, remote streaming, dynamic playlists, advanced visualizations, and offline caching." />
   <meta name="author" content="Varun Prasath" />
   <style>
+    /* Base Variables & Vibrant Color Scheme */
     :root {
-      --primary-color: #FF00FF;
-      --secondary-color: #00FFFF;
-      --accent-color: #FFFF00;
+      --primary-color: #FF00FF; /* Neon Magenta */
+      --secondary-color: #00FFFF; /* Neon Cyan */
+      --accent-color: #FFFF00; /* Bright Yellow */
       --bg-dark: #1a1a1a;
       --bg-light: #ffffff;
       --text-light: #ffffff;
@@ -18,6 +19,14 @@
       --border-radius: 10px;
       --transition-speed: 0.3s;
       --shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+    /* Background Animation */
+    @keyframes vibrantGradient {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 50% 0%; }
+      50% { background-position: 100% 50%; }
+      75% { background-position: 50% 100%; }
+      100% { background-position: 0% 50%; }
     }
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -33,13 +42,6 @@
       flex-direction: column;
       align-items: center;
       transition: background var(--transition-speed), color var(--transition-speed);
-    }
-    @keyframes vibrantGradient {
-      0% { background-position: 0% 50%; }
-      25% { background-position: 50% 0%; }
-      50% { background-position: 100% 50%; }
-      75% { background-position: 50% 100%; }
-      100% { background-position: 0% 50%; }
     }
     header {
       width: 100%;
@@ -78,7 +80,7 @@
       width: 90%;
       max-width: 1200px;
       margin: 2rem auto;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0, 0, 0, 0.85);
       padding: 1.5rem;
       border-radius: var(--border-radius);
       box-shadow: var(--shadow);
@@ -87,6 +89,7 @@
       flex-direction: column;
       gap: 1rem;
     }
+    /* Now Playing */
     .now-playing {
       display: flex;
       flex-direction: row;
@@ -130,6 +133,7 @@
       color: var(--accent-color);
       min-height: 1.2rem;
     }
+    /* Media Display */
     #display-container {
       position: relative;
       width: 100%;
@@ -156,6 +160,7 @@
     .hidden {
       display: none !important;
     }
+    /* Seek Bar & Time */
     .seek-bar {
       width: 100%;
       background: #333;
@@ -192,7 +197,30 @@
       font-size: 1rem;
       margin-bottom: 1rem;
     }
-    /* FIXED: Controls horizontal layout */
+    /* MAIN PLAYBACK BUTTONS - HORIZONTAL ROW */
+    .main-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .main-controls button {
+      background: var(--secondary-color);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0.6rem 1rem;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-dark);
+      transition: background var(--transition-speed);
+      user-select: none;
+      min-width: 50px;
+      text-align: center;
+    }
+    .main-controls button:hover {
+      background: var(--accent-color);
+    }
+    /* OTHER CONTROLS - KEEP ORIGINAL LAYOUT */
     .controls {
       display: flex;
       flex-wrap: wrap;
@@ -200,13 +228,6 @@
       gap: 0.7rem;
       margin-bottom: 1rem;
       align-items: center;
-      flex-direction: row; /* Ensures horizontal layout */
-    }
-    @media (max-width: 480px) {
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
     }
     .controls button,
     .controls input[type="range"],
@@ -233,6 +254,7 @@
       gap: 0.5rem;
       min-width: 150px;
     }
+    /* Upload Area */
     .upload-area {
       border: 3px dashed var(--primary-color);
       padding: 1.2rem;
@@ -243,6 +265,7 @@
       font-size: 1.1rem;
       user-select: none;
     }
+    /* Playlist */
     .playlist {
       margin-top: 1rem;
       border: 2px dashed var(--accent-color);
@@ -308,6 +331,7 @@
     .playlist-controls button:hover {
       background: var(--accent-color);
     }
+    /* Mini Player */
     .mini-player {
       position: fixed;
       bottom: 15px;
@@ -333,6 +357,7 @@
       gap: 0.6rem;
       margin-top: 0.5rem;
     }
+    /* Equalizer Graphic */
     #equalizer {
       display: flex;
       gap: 5px;
@@ -368,6 +393,7 @@
       border: none;
       box-shadow: 0 0 5px var(--primary-color);
     }
+    /* Responsive */
     @media (max-width: 600px) {
       .now-playing {
         flex-direction: column;
@@ -390,6 +416,9 @@
         bottom: 10px;
         height: 160px;
       }
+      .main-controls {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
@@ -399,6 +428,7 @@
     <button id="themeToggle" aria-label="Toggle Theme">Switch Theme</button>
   </header>
   <main>
+    <!-- Now Playing -->
     <section class="now-playing" aria-label="Now Playing">
       <div class="album-art" id="albumArt" aria-hidden="true" style="background-image: url('https://via.placeholder.com/100?text=No+Art');"></div>
       <div class="track-info">
@@ -408,38 +438,52 @@
       </div>
     </section>
     <div class="status" aria-live="polite" id="statusMessage">Idle</div>
+
+    <!-- Media Display -->
     <section id="display-container" aria-label="Media Display">
       <canvas id="audio-visualizer" class="hidden" aria-hidden="true"></canvas>
-      <video id="video-player" playsinline aria-label="Media Player" class="hidden" controls crossorigin="anonymous">
+      <video id="video-player" playsinline controls aria-label="Video Player" class="hidden" crossorigin="anonymous">
         <track id="subtitleTrack" label="English" kind="subtitles" srclang="en" default />
       </video>
+      <audio id="audio-player" class="hidden" crossorigin="anonymous"></audio>
     </section>
+
+    <!-- Seek Bar & Time -->
     <div class="seek-bar" id="seek-bar" role="slider" aria-label="Seek Bar" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
       <div class="progress" id="progress"></div>
       <div class="seek-tooltip" id="seek-tooltip" aria-live="off">0:00</div>
     </div>
     <div class="time-display" id="timeDisplay" aria-live="polite">0:00 / 0:00</div>
-    <section class="controls" aria-label="Playback Controls">
+
+    <!-- MAIN PLAYBACK BUTTONS (Horizontal) -->
+    <div class="main-controls" aria-label="Main Playback Controls">
       <button id="prev" aria-label="Previous Track">⏮️</button>
       <button id="play" aria-label="Play">▶️</button>
       <button id="pause" aria-label="Pause" style="display:none;">⏸️</button>
       <button id="next" aria-label="Next Track">⏭️</button>
+    </div>
+
+    <!-- OTHER CONTROLS (Original layout) -->
+    <section class="controls" aria-label="Playback Controls">
       <button id="loop" aria-label="Loop Mode">Loop Off</button>
       <button id="shuffle" aria-label="Shuffle Mode">Shuffle Off</button>
       <button id="pip" aria-label="Picture in Picture">PiP</button>
       <button id="fullscreen" aria-label="Full Screen">Full Screen</button>
       <button id="miniToggle" aria-label="Toggle Mini Player">Mini</button>
       <button id="openFileExplorer" aria-label="Open File Explorer">Open File Explorer</button>
+
       <div class="slider-container">
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1" aria-valuemin="0" aria-valuemax="1" aria-valuenow="1" />
         <button id="mute" aria-label="Mute/Unmute">Mute</button>
       </div>
+
       <div class="slider-container">
         <label for="playbackRate">Speed</label>
         <input type="range" id="playbackRate" min="0.5" max="2" step="0.1" value="1" aria-valuemin="0.5" aria-valuemax="2" aria-valuenow="1" />
         <span id="playbackRateDisplay" aria-live="polite">1x</span>
       </div>
+
       <div class="slider-container">
         <label for="eq">EQ Preset</label>
         <select id="eq" aria-label="Equalizer Preset">
@@ -451,7 +495,9 @@
           <option value="jazz">Jazz</option>
         </select>
       </div>
+
       <div class="slider-container" id="equalizer" aria-label="Graphic Equalizer" role="region" aria-live="polite" tabindex="0" aria-describedby="eqDescription"></div>
+
       <div class="slider-container">
         <label for="vizMode">Visualizer</label>
         <select id="vizMode" aria-label="Visualizer Mode">
@@ -462,21 +508,27 @@
           <option value="particles">Particles</option>
         </select>
       </div>
+
       <div class="slider-container">
         <label for="urlInput">Stream URL</label>
         <input type="text" id="urlInput" placeholder="Enter media URL" aria-label="Stream URL" />
         <button id="loadURL" aria-label="Load URL">Load</button>
       </div>
+
       <div class="slider-container">
         <label for="subtitleInput">Subtitles (.vtt)</label>
         <input type="file" id="subtitleInput" accept=".vtt" aria-label="Load Subtitle File" />
         <button id="toggleSubtitles" aria-label="Toggle Subtitles" disabled>Toggle Subtitles</button>
       </div>
     </section>
+
+    <!-- Upload Area -->
     <div class="upload-area" id="uploadArea" tabindex="0" aria-label="Click or drop files to upload">
       Drag & Drop files here or click to upload.
       <input type="file" id="fileInput" multiple style="display:none;" aria-label="Upload Media Files" />
     </div>
+
+    <!-- Playlist -->
     <section class="playlist" aria-label="Playlist">
       <ul id="playlistItems" tabindex="0" aria-live="polite" aria-relevant="additions removals"></ul>
       <div class="playlist-search">
@@ -488,10 +540,14 @@
         <input type="file" id="playlistFileInput" accept=".json" style="display:none" aria-label="Load Playlist File" />
       </div>
     </section>
+
+    <!-- Footer Scan Button -->
     <div class="footer-scan">
       <button id="scanLocal" aria-label="Scan Local Media">Scan Local Media</button>
     </div>
   </main>
+
+  <!-- Mini Player -->
   <div class="mini-player" id="miniPlayer" aria-label="Mini Player" role="region" aria-live="polite">
     <div id="miniDisplay" aria-hidden="true">Mini Player</div>
     <div class="mini-controls">
@@ -500,7 +556,6 @@
       <button id="miniClose" aria-label="Close Mini Player">✖️</button>
     </div>
   </div>
-  <audio id="audio-player" class="hidden" crossorigin="anonymous"></audio>
 
   <!-- Dash.js for DASH/HLS streaming -->
   <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
@@ -849,8 +904,8 @@
         const videoExts = ["mp4", "webm", "ogg"];
         const audioExts = ["mp3", "flac", "wav", "aac"];
         if (videoExts.includes(ext)) return "video";
-        else if (audioExts.includes(ext)) return "audio";
-        else return "audio";
+        if (audioExts.includes(ext)) return "audio";
+        return "audio";
       }
 
       function formatTime(time) {
