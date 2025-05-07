@@ -900,7 +900,8 @@
       resizeCanvas();
 
       function getMediaType(src) {
-        const ext = src.split(".").pop().toLowerCase();
+        const cleanSrc = src.split('?')[0].split('#')[0];
+const extension = cleanSrc.split('.').pop().toLowerCase();
         const videoExts = ["mp4", "webm", "ogg"];
         const audioExts = ["mp3", "flac", "wav", "aac"];
         if (videoExts.includes(ext)) return "video";
