@@ -1441,6 +1441,13 @@ const extension = cleanSrc.split('.').pop().toLowerCase();
           .catch((err) => console.error("Service Worker registration failed:", err));
       });
     }
+    const input = document.createElement("input");
+input.type = "file";
+input.webkitdirectory = true;
+input.multiple = true;
+input.accept = "audio/*,video/*";
+input.onchange = () => handleFiles(Array.from(input.files));
+input.click();
   </script>
 </body>
 </html>
