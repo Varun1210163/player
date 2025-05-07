@@ -590,12 +590,10 @@
   </div>
 
   <!-- Dash.js for DASH/HLS streaming -->
-  <script src="https://cdn.dashjs.org/latest/dash.all.min.js">
-</script>
+  <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
 
   <script>
-
-    document.addEventListener("DOMContentLoaded", () => {
+    document?.addEventListener("DOMContentLoaded", () => {
       /* ===== DOM Elements ===== */
       const videoPlayer = document.getElementById("video-player");
       const audioPlayer = document.getElementById("audio-player");
@@ -682,9 +680,12 @@
         },
       ];
       let songs = [...defaultSongs];
+      // initialize playlist with defaults if empty
+      if (playlist.length === 0) playlist = songs.map((_, idx) => idx);
+
 
       /* ===== Theme Toggle ===== */
-      themeToggleBtn.addEventListener("click", () => {
+      themeToggleBtn?.addEventListener("click", () => {
         const currentTheme = document.documentElement.getAttribute("data-theme");
         if (currentTheme === "dark") {
           document.documentElement.setAttribute("data-theme", "light");
@@ -697,7 +698,7 @@
         }
       
       // Keyboard shortcuts
-      document.addEventListener("keydown", e => {
+      document?.addEventListener("keydown", e => {
         if (e.target.tagName === "INPUT" || e.target.tagName === "BUTTON") return;
         switch (e.code) {
           case "Space":
@@ -721,7 +722,7 @@
         }
       });
       // Fullscreen toggle
-      fsToggle.addEventListener("click", () => {
+      fsToggle?.addEventListener("click", () => {
         const el = document.getElementById("display-container");
         if (!document.fullscreenElement) el.requestFullscreen();
         else document.exitFullscreen();
@@ -749,17 +750,17 @@
           li.tabIndex = 0;
           li.setAttribute("role", "button");
           li.setAttribute("aria-pressed", currentIndex === i ? "true" : "false");
-          li.addEventListener("click", () => playMedia(i));
-          li.addEventListener("keypress", (e) => {
+          li?.addEventListener("click", () => playMedia(i));
+          li?.addEventListener("keypress", (e) => {
             if (e.key === "Enter") playMedia(i);
           });
-          li.addEventListener("dragstart", handleDragStart);
-          li.addEventListener("dragover", handleDragOver);
-          li.addEventListener("drop", handleDrop);
+          li?.addEventListener("dragstart", handleDragStart);
+          li?.addEventListener("dragover", handleDragOver);
+          li?.addEventListener("drop", handleDrop);
           playlistEl.appendChild(li);
         });
       }
-      playlistSearch.addEventListener("input", populatePlaylist);
+      playlistSearch?.addEventListener("input", populatePlaylist);
 
       /* ===== Drag & Drop Handlers ===== */
       let dragSrcEl = null;
@@ -791,7 +792,7 @@
       }
 
       /* ===== Auto-Save & Load Playlist ===== */
-      window.addEventListener("load", () => {
+      window?.addEventListener("load", () => {
         const savedIndex = localStorage.getItem("lastIndex");
         const savedTime = localStorage.getItem("lastTime");
         const savedPlaylist = localStorage.getItem("playlistOrder");
@@ -806,7 +807,7 @@
         }
         playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
       });
-      window.addEventListener("beforeunload", () => {
+      window?.addEventListener("beforeunload", () => {
         const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
         localStorage.setItem("lastIndex", currentIndex);
         localStorage.setItem("lastTime", player.currentTime);
@@ -863,7 +864,7 @@
           slider.step = 0.1;
           slider.title = `Frequency ${band.freq}Hz`;
           slider.setAttribute("aria-label", `Frequency ${band.freq}Hz`);
-          slider.addEventListener("input", () => {
+          slider?.addEventListener("input", () => {
             eqFilters[i].gain.value = slider.value;
           });
           equalizerContainer.appendChild(slider);
@@ -880,7 +881,7 @@
         rock: [5, 3, 0, -2, 3, 5],
         jazz: [4, 3, 0, 3, 4, 5],
       };
-      eqSelect.addEventListener("change", () => {
+      eqSelect?.addEventListener("change", () => {
         const preset = eqSelect.value;
         const gains = EQ_PRESETS[preset] || EQ_PRESETS.flat;
         eqFilters.forEach((filter, i) => {
@@ -972,7 +973,7 @@
         audioCanvas.width = audioCanvas.clientWidth || 300;
         audioCanvas.height = audioCanvas.clientHeight || 240;
       }
-      window.addEventListener("resize", resizeCanvas);
+      window?.addEventListener("resize", resizeCanvas);
       resizeCanvas();
 
      function getMediaType(src) {
@@ -1072,7 +1073,7 @@
         updatePlaylistAria();
       }
 
-      playBtn.addEventListener("click", () => {
+      playBtn?.addEventListener("click", () => {
         if (currentMediaType === "audio") {
           if (!audioPlayer.src) playMedia(currentIndex);
           else audioPlayer.play().catch((err) => console.error("Audio playback error", err));
@@ -1083,13 +1084,13 @@
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
       });
-      pauseBtn.addEventListener("click", () => {
+      pauseBtn?.addEventListener("click", () => {
         if (currentMediaType === "audio") audioPlayer.pause();
         else videoPlayer.pause();
         pauseBtn.style.display = "none";
         playBtn.style.display = "inline-block";
       });
-      nextBtn.addEventListener("click", () => {
+      nextBtn?.addEventListener("click", () => {
         if (isShuffle) {
           currentIndex = Math.floor(Math.random() * songs.length);
         } else {
@@ -1097,7 +1098,7 @@
         }
         playMedia(currentIndex);
       });
-      prevBtn.addEventListener("click", () => {
+      prevBtn?.addEventListener("click", () => {
         if (isShuffle) {
           currentIndex = Math.floor(Math.random() * songs.length);
         } else {
@@ -1105,15 +1106,15 @@
         }
         playMedia(currentIndex);
       });
-      loopBtn.addEventListener("click", () => {
+      loopBtn?.addEventListener("click", () => {
         loopState = (loopState + 1) % 3;
         loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
       });
-      shuffleBtn.addEventListener("click", () => {
+      shuffleBtn?.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
       });
-      pipBtn.addEventListener("click", async () => {
+      pipBtn?.addEventListener("click", async () => {
         try {
           if (document.pictureInPictureElement) {
             await document.exitPictureInPicture();
@@ -1126,7 +1127,7 @@
           statusMessage.textContent = "PiP error: " + err.message;
         }
       });
-      fullscreenBtn.addEventListener("click", () => {
+      fullscreenBtn?.addEventListener("click", () => {
         if (!document.fullscreenElement) {
           displayContainer.requestFullscreen().catch(() => {
             statusMessage.textContent = "Fullscreen error";
@@ -1146,10 +1147,10 @@
           else videoPlayer.muted = false;
         }
       }
-      volumeSlider.addEventListener("input", () => {
+      volumeSlider?.addEventListener("input", () => {
         updateVolume();
       });
-      muteBtn.addEventListener("click", () => {
+      muteBtn?.addEventListener("click", () => {
         muted = !muted;
         if (currentMediaType === "audio") audioPlayer.muted = muted;
         else videoPlayer.muted = muted;
@@ -1159,7 +1160,7 @@
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       }
 
-      playbackRateSlider.addEventListener("input", () => {
+      playbackRateSlider?.addEventListener("input", () => {
         updatePlaybackRate();
       });
       function updatePlaybackRate() {
@@ -1169,7 +1170,7 @@
         else videoPlayer.playbackRate = rate;
       }
 
-      loadURLBtn.addEventListener("click", () => {
+      loadURLBtn?.addEventListener("click", () => {
         const url = urlInput.value.trim();
         if (url) {
           songs.push({
@@ -1196,16 +1197,16 @@
           seekBar.setAttribute("aria-valuenow", percent.toFixed(0));
         }
       }
-      audioPlayer.addEventListener("timeupdate", updateProgress);
-      videoPlayer.addEventListener("timeupdate", updateProgress);
+      audioPlayer?.addEventListener("timeupdate", updateProgress);
+      videoPlayer?.addEventListener("timeupdate", updateProgress);
 
-      seekBar.addEventListener("click", (e) => {
+      seekBar?.addEventListener("click", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
         const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
         player.currentTime = (clickX / seekBar.offsetWidth) * player.duration;
       });
-      seekBar.addEventListener("mousemove", (e) => {
+      seekBar?.addEventListener("mousemove", (e) => {
         const rect = seekBar.getBoundingClientRect();
         const hoverX = e.clientX - rect.left;
         const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
@@ -1214,7 +1215,7 @@
         seekTooltip.style.left = hoverX + "px";
         seekTooltip.style.display = "block";
       });
-      seekBar.addEventListener("mouseout", () => {
+      seekBar?.addEventListener("mouseout", () => {
         seekTooltip.style.display = "none";
       });
 
@@ -1228,10 +1229,10 @@
           playBtn.style.display = "inline-block";
         }
       }
-      audioPlayer.addEventListener("ended", handleMediaEnd);
-      videoPlayer.addEventListener("ended", handleMediaEnd);
+      audioPlayer?.addEventListener("ended", handleMediaEnd);
+      videoPlayer?.addEventListener("ended", handleMediaEnd);
 
-      document.addEventListener("keydown", (e) => {
+      document?.addEventListener("keydown", (e) => {
         switch (e.key) {
           case " ":
             e.preventDefault();
@@ -1298,17 +1299,17 @@
         }
       });
 
-      document.body.addEventListener("click", () => {
+      document.body?.addEventListener("click", () => {
         if (audioCtx.state === "suspended") audioCtx.resume();
       });
 
-      uploadArea.addEventListener("click", () => fileInput.click());
-      uploadArea.addEventListener("dragover", (e) => e.preventDefault());
-      uploadArea.addEventListener("drop", (e) => {
+      uploadArea?.addEventListener("click", () => fileInput.click());
+      uploadArea?.addEventListener("dragover", (e) => e.preventDefault());
+      uploadArea?.addEventListener("drop", (e) => {
         e.preventDefault();
         handleFiles(e.dataTransfer.files);
       });
-      fileInput.addEventListener("change", (e) => {
+      fileInput?.addEventListener("change", (e) => {
         handleFiles(e.target.files);
       });
       function handleFiles(files) {
@@ -1329,7 +1330,7 @@
         populatePlaylist();
       }
 
-      scanLocalBtn.addEventListener("click", async () => {
+      scanLocalBtn?.addEventListener("click", async () => {
         scanSpinner.classList.remove("hidden"); statusMessage.textContent = "";
       try {
           if (window.showDirectoryPicker) {
@@ -1368,22 +1369,22 @@
         }
       });
 
-      miniToggleBtn.addEventListener("click", () => {
+      miniToggleBtn?.addEventListener("click", () => {
         miniPlayer.classList.toggle("active");
       });
-      miniCloseBtn.addEventListener("click", () => {
+      miniCloseBtn?.addEventListener("click", () => {
         miniPlayer.classList.remove("active");
       });
-      miniPlayBtn.addEventListener("click", () => {
+      miniPlayBtn?.addEventListener("click", () => {
         if (currentMediaType === "audio") audioPlayer.play();
         else videoPlayer.play();
       });
-      miniPauseBtn.addEventListener("click", () => {
+      miniPauseBtn?.addEventListener("click", () => {
         if (currentMediaType === "audio") audioPlayer.pause();
         else videoPlayer.pause();
       });
 
-      savePlaylistBtn.addEventListener("click", () => {
+      savePlaylistBtn?.addEventListener("click", () => {
         const playlistData = playlist.map((i) => songs[i]);
         const blob = new Blob([JSON.stringify(playlistData, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
@@ -1393,10 +1394,10 @@
         a.click();
         URL.revokeObjectURL(url);
       });
-      loadPlaylistBtn.addEventListener("click", () => {
+      loadPlaylistBtn?.addEventListener("click", () => {
         playlistFileInput.click();
       });
-      playlistFileInput.addEventListener("change", (e) => {
+      playlistFileInput?.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
@@ -1418,7 +1419,7 @@
         reader.readAsText(file);
       });
 
-      subtitleInput.addEventListener("change", (e) => {
+      subtitleInput?.addEventListener("change", (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const url = URL.createObjectURL(file);
@@ -1428,7 +1429,7 @@
         toggleSubtitlesBtn.disabled = false;
         toggleSubtitlesBtn.textContent = "Subtitles On";
       });
-      toggleSubtitlesBtn.addEventListener("click", () => {
+      toggleSubtitlesBtn?.addEventListener("click", () => {
         if (!subtitlesEnabled) return;
         if (subtitleTrack.mode === "showing") {
           subtitleTrack.mode = "hidden";
@@ -1454,7 +1455,7 @@
       resizeCanvas();
 
       /* ===== File Explorer Popup ===== */
-      openFileExplorerBtn.addEventListener("click", () => {
+      openFileExplorerBtn?.addEventListener("click", () => {
         const explorerWindow = window.open("", "File Explorer", "width=400,height=300");
         if (!explorerWindow) {
           alert("Popup blocked! Please allow popups for this site.");
@@ -1493,7 +1494,7 @@
         explorerWindow.document.body.appendChild(input);
         explorerWindow.document.body.appendChild(addButton);
 
-        addButton.addEventListener("click", () => {
+        addButton?.addEventListener("click", () => {
           if (input.files.length === 0) {
             alert("No files selected");
             return;
@@ -1523,7 +1524,7 @@
 
     /* ===== Service Worker Registration ===== */
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
+      window?.addEventListener("load", () => {
         navigator.serviceWorker.register("service-worker.js")
           .then(() => console.log("Service Worker Registered"))
           .catch((err) => console.error("Service Worker registration failed:", err));
@@ -1536,7 +1537,6 @@ input.multiple = true;
 input.accept = "audio/*,video/*";
 input.onchange = () => handleFiles(Array.from(input.files));
 input.click();
-  
-</script>
+  </script>
 </body>
 </html>
