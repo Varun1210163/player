@@ -1537,6 +1537,18 @@ input.multiple = true;
 input.accept = "audio/*,video/*";
 input.onchange = () => handleFiles(Array.from(input.files));
 input.click();
+function togglePlayPause() {
+  const player = currentMediaType === "video" ? videoPlayer : audioPlayer;
+  if (player.paused) {
+    player.play();
+    updatePlayPauseUI(true);
+    statusMessage.textContent = "Playing";
+  } else {
+    player.pause();
+    updatePlayPauseUI(false);
+    statusMessage.textContent = "Paused";
+  }
+}
   </script>
 </body>
 </html>
