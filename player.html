@@ -900,16 +900,16 @@
       window.addEventListener("resize", resizeCanvas);
       resizeCanvas();
 
-      function getMediaType(src) {
-        const cleanSrc = src.split('?')[0].split('#')[0];
-const extension = cleanSrc.split('.').pop().toLowerCase();
-        const videoExts = ["mp4", "webm", "ogg"];
-        const audioExts = ["mp3", "flac", "wav", "aac"];
-        if (videoExts.includes(ext)) return "video";
-        if (audioExts.includes(ext)) return "audio";
-        return "audio";
-      }
-
+     function getMediaType(src) {
+  // strip off any query or hash
+  const clean = src.split('?')[0].split('#')[0];
+  const ext = clean.split('.').pop().toLowerCase();
+  const videoExts = ["mp4","webm","ogg"];
+  const audioExts = ["mp3","flac","wav","aac"];
+  if (videoExts.includes(ext)) return "video";
+  if (audioExts.includes(ext)) return "audio";
+  return "audio";  // fallback
+}
       function formatTime(time) {
         if (isNaN(time)) return "0:00";
         const minutes = Math.floor(time / 60);
