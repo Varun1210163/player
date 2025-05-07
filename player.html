@@ -147,15 +147,16 @@
       align-items: center;
     }
     #audio-visualizer,
-    #video-player {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    z-index: 2; /* Ensure it shows above canvas if needed */
-    background-color: black;
+    /* ► replace or add into your existing CSS */
+#video-player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;    /* scale video inside container */
+  z-index: 2;             /* above the visualizer canvas */
+  background-color: black;
 }
     .hidden {
       display: none !important;
