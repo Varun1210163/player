@@ -1537,14 +1537,21 @@
 
     });
 
-    /* ===== Service Worker Registration ===== */
-    if ("serviceWorker" in navigator) {
-      window?.addEventListener("load", () => {
-        navigator.serviceWorker.register("service-worker.js")
-          .then(() => console.log("Service Worker Registered"))
-          .catch((err) => console.error("Service Worker registration failed:", err));
-      });
-    }
+   function openDirectoryPicker() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.webkitdirectory = true;
+  input.click();
+}
+
+scanButton?.addEventListener("click", openDirectoryPicker); }function openDirectoryPicker() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.webkitdirectory = true;
+  input.click();
+}
+
+scanButton?.addEventListener("click", openDirectoryPicker);
     const input = document.createElement("input");
 input.type = "file";
 input.webkitdirectory = true;
