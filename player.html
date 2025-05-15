@@ -1550,6 +1550,7 @@ function openDirectoryPicker() {
   input.webkitdirectory = true;
   input.click();
 }
+    scanSpinner.classList.remove("hidden");
 scanLocalBtn.addEventListener("click", openDirectoryPicker);
 scanButton?.addEventListener("click", openDirectoryPicker);
   function togglePlayPause() {
