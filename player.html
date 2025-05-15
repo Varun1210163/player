@@ -1550,7 +1550,7 @@ function openDirectoryPicker() {
   input.webkitdirectory = true;
   input.click();
 }
-
+scanLocalBtn.addEventListener("click", openDirectoryPicker);
 scanButton?.addEventListener("click", openDirectoryPicker);
   function togglePlayPause() {
   const player = currentMediaType === "video" ? videoPlayer : audioPlayer;
