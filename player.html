@@ -148,33 +148,19 @@
     }
     #audio-visualizer,
     /* ► replace or add into your existing CSS */
+/* Consolidated styles for video player container */
 #video-player {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: contain;    /* scale video inside container */
-  z-index: 2;             /* above the visualizer canvas */
-  background-color: black;
-}
-    /* BEFORE */
-#video-player {
-  width: 100%;
-  background: black;
-}
-/* …later… */
-#video-player {
-  height: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  background: #000;
   border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
-
-/* AFTER: single block with all properties */
-#video-player {
-  width: 100%;
-  height: auto;
-  background: black;
-  border-radius: 8px;
+.hidden {
+  display: none !important;
 }
     /* Seek Bar & Time */
     .seek-bar {
