@@ -158,6 +158,24 @@
   z-index: 2;             /* above the visualizer canvas */
   background-color: black;
 }
+    /* BEFORE */
+#video-player {
+  width: 100%;
+  background: black;
+}
+/* …later… */
+#video-player {
+  height: auto;
+  border-radius: 8px;
+}
+
+/* AFTER: single block with all properties */
+#video-player {
+  width: 100%;
+  height: auto;
+  background: black;
+  border-radius: 8px;
+}
     /* Seek Bar & Time */
     .seek-bar {
       width: 100%;
