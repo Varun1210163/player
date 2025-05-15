@@ -1524,37 +1524,31 @@
       });
 
     });
+    async function openDirectoryPicker() {
+  try {
+    const dirHandle = await window.showDirectoryPicker();
+    const files = [];
 
-   function openDirectoryPicker() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.webkitdirectory = true;
-  input.click();
-}
+    for await (const entry of dirHandle.values()) {
+      if (entry.kind === "file" && entry.name.endsWith(".mp3")) {
+        const file = await entry.getFile();
+        const url = URL.createObjectURL(file);
+        files.push(url);
+      }
+    }
 
-scanButton?.addEventListener("click", openDirectoryPicker); }function openDirectoryPicker() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.webkitdirectory = true;
-  input.click();
+    if (files.length > 0) {
+      songs = files;
+      playlist = files.map((_, i) => i); // <- this is key!
+      localStorage.setItem("playlistOrder", JSON.stringify(playlist));
+      playIndex(0); // Start playing first song
+    } else {
+      alert("No MP3 files found in folder.");
+    }
+  } catch (err) {
+    console.error("Directory picker error:", err);
+  }
 }
-
-scanButton?.addEventListener("click", openDirectoryPicker);
-    const input = document.createElement("input");
-input.type = "file";
-input.webkitdirectory = true;
-input.multiple = true;
-input.accept = "audio/*,video/*";
-input.onchange = () => handleFiles(Array.from(input.files));
-function openDirectoryPicker() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.webkitdirectory = true;
-  input.click();
-}
-    scanSpinner.classList.remove("hidden");
-scanLocalBtn.addEventListener("click", openDirectoryPicker);
-scanButton?.addEventListener("click", openDirectoryPicker);
   function togglePlayPause() {
   const player = currentMediaType === "video" ? videoPlayer : audioPlayer;
   if (player.paused) {
