@@ -1551,7 +1551,6 @@ input.webkitdirectory = true;
 input.multiple = true;
 input.accept = "audio/*,video/*";
 input.onchange = () => handleFiles(Array.from(input.files));
-input.click();
 function togglePlayPause() {
   const player = currentMediaType === "video" ? videoPlayer : audioPlayer;
   if (player.paused) {
