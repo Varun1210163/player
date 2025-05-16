@@ -530,7 +530,7 @@
         const mode = vizSelect.value;
         const bufferLength = (mode === "waveform") ? analyser.fftSize : analyser.frequencyBinCount;
         let dataArray = new Uint8Array(bufferLength);
-        if(mode === "waveform"){
+        if (mode === "waveform") {
           analyser.getByteTimeDomainData(dataArray);
         } else {
           analyser.getByteFrequencyData(dataArray);
@@ -564,87 +564,97 @@
           for (let i = 0; i < dataArray.length; i++) {
             const v = dataArray[i] / 255;
             const hue = v * 360;
-            ctx.fillStyle = `hsl(${hue},100%,50%)`;
-            ctx.fillRect(i * sliceWidth, audioCanvas.height * (1 - v), sliceWidth, audioCanvas.height * v);
+            ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
+            const barHeight = dataArray[i] / 2;
+            ctx.fillRect(i * sliceWidth, audioCanvas.height - barHeight, sliceWidth, barHeight);
           }
         } else if (mode === "circular") {
           const radius = Math.min(audioCanvas.width, audioCanvas.height) / 4;
-          const cx = audioCanvas.width / 2;
-          const cy = audioCanvas.height / 2;
-          const angleStep = (Math.PI * 2) / bufferLength;
+          const centerX = audioCanvas.width / 2;
+          const centerY = audioCanvas.height / 2;
+          const slice = (Math.PI * 2) / bufferLength;
           for (let i = 0; i < bufferLength; i++) {
-            const amplitude = dataArray[i] / 255;
-            const barHeight = amplitude * 50;
-            const angle = i * angleStep;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.fillStyle = `rgba(255,255,255,${amplitude})`;
-            ctx.fillRect(0, -2, barHeight, 4);
-            ctx.restore();
+            const value = dataArray[i] / 255;
+            const lineHeight = value * radius;
+            const angle = slice * i;
+            const x1 = centerX + Math.cos(angle) * radius;
+            const y1 = centerY + Math.sin(angle) * radius;
+            const x2 = centerX + Math.cos(angle) * (radius + lineHeight);
+            const y2 = centerY + Math.sin(angle) * (radius + lineHeight);
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color');
+            ctx.lineWidth = 2;
+            ctx.stroke();
           }
         }
       }
       drawVisualizer();
-      function resizeCanvas() {
-        audioCanvas.width = audioCanvas.clientWidth || 300;
-        audioCanvas.height = audioCanvas.clientHeight || 240;
-      }
-      window.addEventListener("resize", resizeCanvas);
-      resizeCanvas();
 
-      /* ===== Determine Media Type ===== */
-      function getMediaType(src) {
-        const ext = src.split('.').pop().toLowerCase();
-        const videoExts = ["mp4", "webm", "ogg"];
-        const audioExts = ["mp3", "flac", "wav", "aac"];
-        if (videoExts.includes(ext)) return "video";
-        else if (audioExts.includes(ext)) return "audio";
-        else return "audio";
+      /* ===== Seek Bar & Time Updates ===== */
+      audioPlayer.addEventListener("timeupdate", updateProgress);
+      videoPlayer.addEventListener("timeupdate", updateProgress);
+      function updateProgress(e) {
+        const player = e.target;
+        const percent = (player.currentTime / player.duration) * 100 || 0;
+        progressBar.style.width = percent + "%";
+        timeDisplay.textContent = formatTime(player.currentTime) + " / " + formatTime(player.duration);
+        localStorage.setItem("lastTime", player.currentTime);
+      }
+      seekBar.addEventListener("click", (e) => {
+        const rect = seekBar.getBoundingClientRect();
+        const seekTime = ((e.clientX - rect.left) / rect.width) * (currentMediaType === "audio" ? audioPlayer.duration : videoPlayer.duration);
+        if (currentMediaType === "audio") audioPlayer.currentTime = seekTime;
+        else videoPlayer.currentTime = seekTime;
+      });
+      function formatTime(sec) {
+        const m = Math.floor(sec / 60) || 0;
+        const s = Math.floor(sec % 60) || 0;
+        return m + ":" + (s < 10 ? "0" + s : s);
       }
 
-      /* ===== Playback Functions ===== */
+      /* ===== Updated playMedia Function ===== */
       function playMedia(index, startTime = 0) {
-        currentIndex = index;
-        const track = songs[playlist[index]];
-        trackTitle.textContent = track.title;
-        trackMeta.textContent = track.meta;
-        const type = getMediaType(track.src);
-        currentMediaType = type;
+        const media = songs[index];
+        const isVideo = /\.(mp4|webm|ogg)$/i.test(media.src);
+
+        // Pause both players before switching
         audioPlayer.pause();
         videoPlayer.pause();
-        // Remove the catch error from statusMessage to avoid false error messages
-        if (type === "audio") {
-          audioPlayer.classList.remove("hidden");
+
+        currentIndex = index;
+        currentMediaType = isVideo ? "video" : "audio";
+
+        // Toggle display
+        if (isVideo) {
+          audioCanvas.classList.add("hidden");
+          videoPlayer.classList.remove("hidden");
+          videoPlayer.src = media.src;
+          videoPlayer.currentTime = startTime;
+          videoPlayer.load();
+          videoPlayer.play();
+        } else {
           videoPlayer.classList.add("hidden");
           audioCanvas.classList.remove("hidden");
-          audioPlayer.src = track.src;
-          audioPlayer.load();
+          audioPlayer.src = media.src;
           audioPlayer.currentTime = startTime;
-          audioPlayer.play().catch(err => console.error("Audio playback error", err));
-        } else {
-          videoPlayer.classList.remove("hidden");
-          audioPlayer.classList.add("hidden");
-          audioCanvas.classList.add("hidden");
-          videoPlayer.src = track.src;
-          videoPlayer.load();
-          videoPlayer.currentTime = startTime;
-          videoPlayer.play().catch(err => console.error("Video playback error", err));
+          audioPlayer.load();
+          audioPlayer.play();
         }
+
+        // Update UI
+        trackTitle.textContent = media.title;
+        trackMeta.textContent = media.meta;
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
-        statusMessage.textContent = "Playing...";
+        statusMessage.textContent = `Playing ${isVideo ? "Video" : "Audio"}: ${media.title}`;
       }
+
+      /* ===== Play/Pause, Next/Prev, Loop, Shuffle, PiP, Fullscreen, Mini ===== */
       playBtn.addEventListener("click", () => {
-        if (currentMediaType === "audio") {
-          if (!audioPlayer.src) playMedia(currentIndex);
-          else audioPlayer.play().catch(err => console.error("Audio playback error", err));
-        } else {
-          if (!videoPlayer.src) playMedia(currentIndex);
-          else videoPlayer.play().catch(err => console.error("Video playback error", err));
-        }
+        if (currentMediaType === "audio") audioPlayer.play();
+        else videoPlayer.play();
         playBtn.style.display = "none";
         pauseBtn.style.display = "inline-block";
       });
@@ -655,173 +665,118 @@
         playBtn.style.display = "inline-block";
       });
       nextBtn.addEventListener("click", () => {
-        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex + 1) % songs.length;
+        if (isShuffle) currentIndex = Math.floor(Math.random() * songs.length);
+        else currentIndex = (currentIndex + 1) % songs.length;
         playMedia(currentIndex);
       });
       prevBtn.addEventListener("click", () => {
-        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex - 1 + songs.length) % songs.length;
+        currentIndex = (currentIndex - 1 + songs.length) % songs.length;
         playMedia(currentIndex);
       });
       loopBtn.addEventListener("click", () => {
         loopState = (loopState + 1) % 3;
+        audioPlayer.loop = loopState === 1;
+        videoPlayer.loop = loopState === 1;
         loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
       });
       shuffleBtn.addEventListener("click", () => {
         isShuffle = !isShuffle;
         shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
       });
-      pipBtn.addEventListener("click", async () => {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else if (currentMediaType === "video") {
-          await videoPlayer.requestPictureInPicture();
-        }
+      pipBtn.addEventListener("click", () => {
+        if (document.pictureInPictureElement) document.exitPictureInPicture();
+        else if (videoPlayer.requestPictureInPicture) videoPlayer.requestPictureInPicture();
       });
       fullscreenBtn.addEventListener("click", () => {
-        if (!document.fullscreenElement) {
-          displayContainer.requestFullscreen().catch(err => statusMessage.textContent = "Fullscreen error");
-        } else {
-          document.exitFullscreen();
-        }
+        if (!document.fullscreenElement) displayContainer.requestFullscreen();
+        else document.exitFullscreen();
       });
+      miniToggleBtn.addEventListener("click", () => {
+        document.getElementById("miniPlayer").classList.toggle("active");
+      });
+
+      /* ===== Volume & Mute ===== */
       volumeSlider.addEventListener("input", () => {
-        if (currentMediaType === "audio") audioPlayer.volume = volumeSlider.value;
-        else videoPlayer.volume = volumeSlider.value;
-        if (volumeSlider.value > 0) {
-          muted = false;
-          muteBtn.textContent = "Mute";
-        }
+        audioPlayer.volume = volumeSlider.value;
+        videoPlayer.volume = volumeSlider.value;
       });
       muteBtn.addEventListener("click", () => {
         muted = !muted;
-        if (currentMediaType === "audio") audioPlayer.muted = muted;
-        else videoPlayer.muted = muted;
+        audioPlayer.muted = muted;
+        videoPlayer.muted = muted;
         muteBtn.textContent = muted ? "Unmute" : "Mute";
       });
-      loadURLBtn.addEventListener("click", () => {
-        const url = urlInput.value.trim();
-        if (url) {
-          songs.push({ title: url, src: url, meta: "Remote Stream" });
-          playlist.push(songs.length - 1);
-          populatePlaylist();
-          urlInput.value = "";
-        }
+
+      /* ===== EQ & Visualizer Mode ===== */
+      eqSelect.addEventListener("change", () => {
+        // Placeholder for EQ processing
+        statusMessage.textContent = `EQ set to ${eqSelect.value}`;
       });
-      function updateProgress() {
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        if (player.duration) {
-          const percent = (player.currentTime / player.duration) * 100;
-          progressBar.style.width = percent + "%";
-          timeDisplay.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
-        }
-      }
-      audioPlayer.addEventListener("timeupdate", updateProgress);
-      videoPlayer.addEventListener("timeupdate", updateProgress);
-      seekBar.addEventListener("click", (e) => {
-        const rect = seekBar.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        player.currentTime = (clickX / seekBar.offsetWidth) * player.duration;
-      });
-      seekBar.addEventListener("mousemove", (e) => {
-        const rect = seekBar.getBoundingClientRect();
-        const hoverX = e.clientX - rect.left;
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        const time = (hoverX / seekBar.offsetWidth) * player.duration;
-        seekTooltip.textContent = formatTime(time);
-        seekTooltip.style.left = hoverX + "px";
-        seekTooltip.style.display = "block";
-      });
-      seekBar.addEventListener("mouseout", () => {
-        seekTooltip.style.display = "none";
-      });
-      function formatTime(time) {
-        if (isNaN(time)) return "0:00";
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60).toString().padStart(2, "0");
-        return `${minutes}:${seconds}`;
-      }
-      function handleMediaEnd() {
-        if (loopState === 1) playMedia(currentIndex);
-        else nextBtn.click();
-      }
-      audioPlayer.addEventListener("ended", handleMediaEnd);
-      videoPlayer.addEventListener("ended", handleMediaEnd);
-      document.addEventListener("keydown", (e) => {
-        switch (e.key) {
-          case " ":
-            e.preventDefault();
-            (currentMediaType === "audio" ? audioPlayer.paused : videoPlayer.paused) ? playBtn.click() : pauseBtn.click();
-            break;
-          case "ArrowRight":
-            nextBtn.click();
-            break;
-          case "ArrowLeft":
-            prevBtn.click();
-            break;
-          case "ArrowUp":
-            volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
-            volumeSlider.dispatchEvent(new Event("input"));
-            break;
-          case "ArrowDown":
-            volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
-            volumeSlider.dispatchEvent(new Event("input"));
-            break;
-        }
-      });
-      document.body.addEventListener("click", () => {
-        if (audioCtx.state === "suspended") audioCtx.resume();
+      vizSelect.addEventListener("change", () => {
+        audioCanvas.classList.toggle("hidden", currentMediaType !== "audio");
       });
 
-      /* ===== File Upload & Drag-and-Drop ===== */
+      /* ===== Stream URL Loading ===== */
+      loadURLBtn.addEventListener("click", () => {
+        const url = urlInput.value.trim();
+        if (!url) return;
+        songs.push({ title: "Stream", src: url, meta: "Live Stream" });
+        playlist.push(songs.length - 1);
+        populatePlaylist();
+        playMedia(songs.length - 1);
+      });
+
+      /* ===== Uploading Local Files ===== */
       uploadArea.addEventListener("click", () => fileInput.click());
-      uploadArea.addEventListener("dragover", (e) => { e.preventDefault(); });
+      uploadArea.addEventListener("dragover", (e) => e.preventDefault());
       uploadArea.addEventListener("drop", (e) => {
         e.preventDefault();
-        handleFiles(e.dataTransfer.files);
-      });
-      fileInput.addEventListener("change", (e) => {
-        handleFiles(e.target.files);
-      });
-      function handleFiles(files) {
-        Array.from(files).forEach(file => {
-          const url = URL.createObjectURL(file);
-          songs.push({ title: file.name, src: url, meta: "Local File" });
+        [...e.dataTransfer.files].forEach(f => {
+          const url = URL.createObjectURL(f);
+          songs.push({ title: f.name, src: url, meta: f.type });
           playlist.push(songs.length - 1);
         });
         populatePlaylist();
-      }
+      });
+      fileInput.addEventListener("change", () => {
+        [...fileInput.files].forEach(f => {
+          const url = URL.createObjectURL(f);
+          songs.push({ title: f.name, src: url, meta: f.type });
+          playlist.push(songs.length - 1);
+        });
+        populatePlaylist();
+      });
 
-      /* ===== Scan Local Media Feature ===== */
-      // Always show the scan button. Even if the API isn't supported, the button remains.
-      scanLocalBtn.addEventListener("click", async () => {
-        try {
-          // Attempt to use the directory picker (if available)
-          if (window.showDirectoryPicker) {
-            const dirHandle = await window.showDirectoryPicker();
-            for await (const entry of dirHandle.values()) {
-              if (entry.kind === "file") {
-                const fileName = entry.name;
-                const ext = fileName.split('.').pop().toLowerCase();
-                const audioExts = ["mp3", "flac", "wav", "aac"];
-                const videoExts = ["mp4", "webm", "ogg"];
-                if (audioExts.includes(ext) || videoExts.includes(ext)) {
-                  const file = await entry.getFile();
-                  const url = URL.createObjectURL(file);
-                  songs.push({ title: fileName, src: url, meta: "Local File" });
-                  playlist.push(songs.length - 1);
-                }
-              }
-            }
+      /* ===== Save/Load Playlist ===== */
+      savePlaylistBtn.addEventListener("click", () => {
+        const data = JSON.stringify({ songs, playlist });
+        const blob = new Blob([data], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'playlist.json';
+        a.click();
+      });
+      loadPlaylistBtn.addEventListener("click", () => {
+        const inpu = document.createElement('input');
+        inpu.type = 'file';
+        inpu.accept = 'application/json';
+        inpu.onchange = () => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const obj = JSON.parse(reader.result);
+            songs = obj.songs;
+            playlist = obj.playlist;
             populatePlaylist();
-            statusMessage.textContent = "Local media scanned and added.";
-          } else {
-            // Fallback message if the API isn't supported.
-            statusMessage.textContent = "Local directory access not supported in this browser.";
-          }
-        } catch (err) {
-          statusMessage.textContent = "Failed to access local media: " + err.message;
-        }
+            playMedia(playlist[0]);
+          };
+          reader.readAsText(inpu.files[0]);
+        };
+        inpu.click();
+      });
+
+      /* ===== Local Scan (Placeholder) ===== */
+      scanLocalBtn.addEventListener("click", () => {
+        statusMessage.textContent = "Local scan not supported in browser.";
       });
     });
   </script>
