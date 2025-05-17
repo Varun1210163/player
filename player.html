@@ -455,7 +455,10 @@
         filteredPlaylist.forEach(i => {
           const song = songs[i];
           const li = document.createElement("li");
-          li.textContent = song.title;
+          li.innerHTML = `
+  <span class="song-title">${song.title}</span>
+  <span class="song-meta">${song.meta}</span>
+`;
           li.dataset.index = i;
           li.draggable = true;
           li.tabIndex = 0;
