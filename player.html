@@ -766,10 +766,7 @@
             break;
         }
       });
-      document.body.addEventListener("click", () => {
-        if (audioCtx.state === "suspended") audioCtx.resume();
-      });
-
+      playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
       /* ===== File Upload & Drag-and-Drop ===== */
       uploadArea.addEventListener("click", () => fileInput.click());
       uploadArea.addEventListener("dragover", (e) => { e.preventDefault(); });
