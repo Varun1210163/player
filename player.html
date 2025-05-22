@@ -349,6 +349,7 @@
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
         <button id="mute">Mute</button>
+        <button id="scanGitHub">Scan GitHub Repo</button>
       </div>
       <div class="slider-container">
         <label for="eq">EQ Preset</label>
@@ -710,7 +711,12 @@
           urlInput.value="";
         }
       });
-
+scanGitHubBtn.addEventListener("click", () => {
+  scanGitHubRepo().catch(err => {
+    console.error(err);
+    statusMessage.textContent = "GitHub scan failed: " + err.message;
+  });
+});
       // Keyboard shortcuts
       document.addEventListener("keydown",e=>{
         switch(e.key){
@@ -743,7 +749,35 @@
         });
         populatePlaylist();
       }
-
+      async function scanGitHubRepo() {
+  const owner = "varun1210163";
+  const repo  = "music";
+  const branch = "main";
+  const url = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(res.statusText);
+  const { tree } = await res.json();
+  const exts = ["mp3","wav","flac","aac","mp4","webm","ogg"];
+  let added = 0;
+  tree.forEach(item => {
+    if (item.type === "blob") {
+      const ext = item.path.split(".").pop();
+      if (exts.includes(ext)) {
+        const raw = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${item.path}`;
+        songs.push({ title: item.path.split("/").pop(), src: raw, meta: "GitHub" });
+        playlist.push(songs.length - 1);
+        added++;
+      }
+    }
+  });
+  if (added) {
+    populatePlaylist();
+    statusMessage.textContent = `➤ Added ${added} tracks from GitHub!`;
+  } else {
+    statusMessage.textContent = "No media files found in that repo.";
+  }
+      }
+const scanGitHubBtn = document.getElementById("scanGitHub");
       // Scan Local Media
       scanLocalBtn.addEventListener("click",async()=>{
         try {
