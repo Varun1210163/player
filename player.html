@@ -617,6 +617,11 @@
           }
         }
       }
+      // Encourage aggressive buffering
+audioPlayer.preload = 'auto';
+audioPlayer.addEventListener('stalled', () => {
+  statusMessage.textContent = 'Buffering…';
+});
       drawVisualizer();
       function resizeCanvas() {
         audioCanvas.width = audioCanvas.clientWidth || 300;
