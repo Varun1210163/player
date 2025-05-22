@@ -292,26 +292,19 @@
     .footer-scan button:hover {
       background: var(--accent-color);
     }
-    .playlist li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.song-title {
-  flex: 1;
-  text-align: left;
-  font-weight: bold;
-  font-size: 1rem;
-}
-
-.song-meta {
-  flex-shrink: 0;
-  font-size: 0.85rem;
-  opacity: 0.7;
-  margin-left: 10px;
-  text-align: right;
-}
+    .song-title {
+      flex: 1;
+      text-align: left;
+      font-weight: bold;
+      font-size: 1rem;
+    }
+    .song-meta {
+      flex-shrink: 0;
+      font-size: 0.85rem;
+      opacity: 0.7;
+      margin-left: 10px;
+      text-align: right;
+    }
   </style>
 </head>
 <body class="dark">
@@ -319,7 +312,7 @@
     <h1>Ultra Advanced Vibrant Media Player</h1>
   </header>
   <main>
-    <!-- Now Playing Display & ARIA Live Regions -->
+    <!-- Now Playing -->
     <section class="now-playing" aria-label="Now Playing">
       <div class="track-info">
         <h2 id="track-title">Track Title</h2>
@@ -327,42 +320,45 @@
       </div>
     </section>
     <div class="status" aria-live="polite" id="statusMessage">Idle</div>
+
     <!-- Media Display -->
     <section id="display-container" aria-label="Media Display">
       <canvas id="audio-visualizer" class="hidden" aria-hidden="true"></canvas>
-      <video id="video-player" playsinline aria-label="Media Player" class="hidden"></video>
+      <video id="video-player" playsinline class="hidden"></video>
     </section>
+
     <!-- Seek Bar & Time Display -->
-    <div class="seek-bar" id="seek-bar" role="slider" aria-label="Seek Bar">
+    <div class="seek-bar" id="seek-bar" role="slider">
       <div class="progress" id="progress"></div>
       <div class="seek-tooltip" id="seek-tooltip" aria-live="off">0:00</div>
     </div>
-    <div class="time-display" id="timeDisplay" aria-live="polite">0:00 / 0:00</div>
-    <!-- Playback & Extra Controls -->
-    <section class="controls" aria-label="Playback Controls">
-      <button id="prev" aria-label="Previous Track">⏮️</button>
-      <button id="play" aria-label="Play">▶️</button>
-      <button id="pause" aria-label="Pause" style="display:none;">⏸️</button>
-      <button id="next" aria-label="Next Track">⏭️</button>
-      <button id="loop" aria-label="Loop Mode">Loop Off</button>
-      <button id="shuffle" aria-label="Shuffle Mode">Shuffle Off</button>
-      <button id="pip" aria-label="Picture in Picture">PiP</button>
-      <button id="fullscreen" aria-label="Full Screen">Full Screen</button>
-      <button id="miniToggle" aria-label="Toggle Mini Player">Mini</button>
+    <div class="time-display" id="timeDisplay">0:00 / 0:00</div>
+
+    <!-- Controls -->
+    <section class="controls">
+      <button id="prev">⏮️</button>
+      <button id="play">▶️</button>
+      <button id="pause" style="display:none;">⏸️</button>
+      <button id="next">⏭️</button>
+      <button id="loop">Loop Off</button>
+      <button id="shuffle">Shuffle Off</button>
+      <button id="pip">PiP</button>
+      <button id="fullscreen">Full Screen</button>
+      <button id="miniToggle">Mini</button>
       <div class="slider-container">
         <label for="volume">Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
-        <button id="mute" aria-label="Mute/Unmute">Mute</button>
+        <button id="mute">Mute</button>
       </div>
       <div class="slider-container">
         <label for="eq">EQ Preset</label>
         <select id="eq">
-          <option value="flat">Flat</option>
-          <option value="bass">Bass Boost</option>
-          <option value="treble">Treble Boost</option>
-          <option value="vocal">Vocal Boost</option>
-          <option value="rock">Rock</option>
-          <option value="jazz">Jazz</option>
+          <option>Flat</option>
+          <option>Bass Boost</option>
+          <option>Treble Boost</option>
+          <option>Vocal Boost</option>
+          <option>Rock</option>
+          <option>Jazz</option>
         </select>
       </div>
       <div class="slider-container">
@@ -377,47 +373,46 @@
       <div class="slider-container">
         <label for="urlInput">Stream URL</label>
         <input type="text" id="urlInput" placeholder="Enter media URL">
-        <button id="loadURL" aria-label="Load URL">Load</button>
+        <button id="loadURL">Load</button>
       </div>
     </section>
+
     <!-- Upload Area -->
-    <div class="upload-area" id="uploadArea" tabindex="0" aria-label="Click or drop files to upload">
+    <div class="upload-area" id="uploadArea">
       Drag & Drop files here or click to upload.
       <input type="file" id="fileInput" multiple style="display:none;">
     </div>
+
     <!-- Playlist -->
-    <section class="playlist" aria-label="Playlist">
+    <section class="playlist">
       <ul id="playlistItems"></ul>
       <div class="playlist-search">
         <input type="text" id="playlistSearch" placeholder="Search playlist...">
       </div>
     </section>
-    <!-- Footer Scan Button -->
+
+    <!-- Scan Local Media -->
     <div class="footer-scan">
-      <button id="scanLocal" aria-label="Scan Local Media">Scan Local Media</button>
+      <button id="scanLocal">Scan Local Media</button>
     </div>
   </main>
+
   <!-- Mini Player -->
-  <div class="mini-player" id="miniPlayer" aria-label="Mini Player">
+  <div class="mini-player" id="miniPlayer">
     <div id="miniDisplay">Mini Player</div>
     <div class="mini-controls">
-      <button id="miniPlay" aria-label="Play">▶️</button>
-      <button id="miniPause" aria-label="Pause">⏸️</button>
-      <button id="miniClose" aria-label="Close Mini Player">✖️</button>
+      <button id="miniPlay">▶️</button>
+      <button id="miniPause">⏸️</button>
+      <button id="miniClose">✖️</button>
     </div>
   </div>
+
   <!-- Hidden Audio Element -->
   <audio id="audio-player" class="hidden"></audio>
+
   <script>
-    // Resume locked Web Audio on first user gesture
-document.body.addEventListener('click', () => {
-  if (audioCtx.state === 'suspended') {
-    audioCtx.resume();
-    console.log('AudioContext resumed');
-  }
-}, { once: true });
     document.addEventListener("DOMContentLoaded", () => {
-      /* ===== DOM Elements ===== */
+      // DOM Elements
       const videoPlayer = document.getElementById("video-player");
       const audioPlayer = document.getElementById("audio-player");
       const audioCanvas = document.getElementById("audio-visualizer");
@@ -451,13 +446,12 @@ document.body.addEventListener('click', () => {
       const playlistSearch = document.getElementById("playlistSearch");
       const scanLocalBtn = document.getElementById("scanLocal");
 
-      /* ===== Player State ===== */
+      // Player State
       let currentIndex = 0;
       let loopState = 0; // 0: off, 1: repeat one, 2: repeat all
       let isShuffle = false;
-      let muted = false;
       let playlist = [];
-      let currentMediaType = null; // "audio" or "video"
+      let currentMediaType = null;
       const defaultSongs = [
         { title: "Depth of sorrow", src: "https://varun1210163.github.io/music/Depth_of_sorrow.mp3", meta: "Artist - Album" },
         { title: "Goodbye kiiboo", src: "https://varun1210163.github.io/music/Goodbye_kibo.mp3", meta: "Artist - Album" },
@@ -474,23 +468,20 @@ document.body.addEventListener('click', () => {
       ];
       let songs = [...defaultSongs];
 
-      /* ===== Playlist Population ===== */
+      // Populate Playlist
       function populatePlaylist() {
         playlistEl.innerHTML = "";
-        const searchQuery = playlistSearch.value.toLowerCase();
-        const filteredPlaylist = playlist.filter(i => songs[i].title.toLowerCase().includes(searchQuery));
-        filteredPlaylist.forEach(i => {
-          const song = songs[i];
+        const q = playlistSearch.value.toLowerCase();
+        const filtered = playlist.filter(i => songs[i].title.toLowerCase().includes(q));
+        filtered.forEach(i => {
+          const s = songs[i];
           const li = document.createElement("li");
-          li.innerHTML = `
-  <span class="song-title">${song.title}</span>
-  <span class="song-meta">${song.meta}</span>
-`;
+          li.innerHTML = `<span class="song-title">${s.title}</span><span class="song-meta">${s.meta}</span>`;
           li.dataset.index = i;
           li.draggable = true;
           li.tabIndex = 0;
           li.addEventListener("click", () => playMedia(i));
-          li.addEventListener("keypress", (e) => { if (e.key === "Enter") playMedia(i); });
+          li.addEventListener("keypress", e => e.key==="Enter" && playMedia(i));
           li.addEventListener("dragstart", handleDragStart);
           li.addEventListener("dragover", handleDragOver);
           li.addEventListener("drop", handleDrop);
@@ -499,375 +490,287 @@ document.body.addEventListener('click', () => {
       }
       playlistSearch.addEventListener("input", populatePlaylist);
 
-      /* ===== Drag & Drop Handlers ===== */
-      let dragSrcEl = null;
-      function handleDragStart(e) {
-        dragSrcEl = this;
-        this.classList.add("dragging");
-        e.dataTransfer.effectAllowed = 'move';
-      }
-      function handleDragOver(e) {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-      }
+      // Drag & Drop
+      let dragSrc = null;
+      function handleDragStart(e) { dragSrc = this; this.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; }
+      function handleDragOver(e) { e.preventDefault(); return false; }
       function handleDrop(e) {
         e.stopPropagation();
-        if (dragSrcEl !== this) {
-          const srcIndex = parseInt(dragSrcEl.dataset.index, 10);
-          const targetIndex = parseInt(this.dataset.index, 10);
-          [playlist[srcIndex], playlist[targetIndex]] = [playlist[targetIndex], playlist[srcIndex]];
+        if (dragSrc!==this) {
+          const s = +dragSrc.dataset.index, t = +this.dataset.index;
+          [playlist[s],playlist[t]]=[playlist[t],playlist[s]];
           populatePlaylist();
         }
         return false;
       }
 
-      /* ===== Auto-Save & Load Playlist ===== */
-      window.addEventListener("load", () => {
-        const savedIndex = localStorage.getItem("lastIndex");
-        const savedTime = localStorage.getItem("lastTime");
-        const savedPlaylist = localStorage.getItem("playlistOrder");
-        if (savedPlaylist) {
-          playlist = JSON.parse(savedPlaylist);
-        } else {
-          playlist = songs.map((s, i) => i);
-        }
+      // Load/Save
+      window.addEventListener("load", ()=>{
+        const idx = localStorage.getItem("lastIndex"), tm = localStorage.getItem("lastTime");
+        const order = localStorage.getItem("playlistOrder");
+        playlist = order? JSON.parse(order) : songs.map((_,i)=>i);
         populatePlaylist();
-        if (savedIndex !== null && songs[savedIndex]) {
-          currentIndex = parseInt(savedIndex, 10);
-        }
-        playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
+        if (idx!==null && songs[idx]) currentIndex = +idx;
+        playMedia(currentIndex, tm? parseFloat(tm):0);
       });
-      window.addEventListener("beforeunload", () => {
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        localStorage.setItem("lastIndex", currentIndex);
-        localStorage.setItem("lastTime", player.currentTime);
-        localStorage.setItem("playlistOrder", JSON.stringify(playlist));
+      window.addEventListener("beforeunload", ()=>{
+        const p = currentMediaType==="audio"?audioPlayer:videoPlayer;
+        localStorage.setItem("lastIndex",currentIndex);
+        localStorage.setItem("lastTime",p.currentTime);
+        localStorage.setItem("playlistOrder",JSON.stringify(playlist));
       });
 
-      /* ===== Web Audio API & Visualizer ===== */
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      let sourceNode, analyser;
-      function setupAudioAnalyser() {
-        function setupAudioAnalyser() {
-  if (sourceNode) {
-    sourceNode.disconnect();
-  }
-  sourceNode = audioCtx.createMediaElementSource(audioPlayer);
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 256;
-  sourceNode.connect(analyser);
-  analyser.connect(audioCtx.destination);
-}
-      }
-      setupAudioAnalyser();
-      function drawVisualizer() {
-        requestAnimationFrame(drawVisualizer);
-        if (currentMediaType !== "audio") return;
-        const mode = vizSelect.value;
-        const bufferLength = (mode === "waveform") ? analyser.fftSize : analyser.frequencyBinCount;
-        let dataArray = new Uint8Array(bufferLength);
-        if(mode === "waveform"){
-          analyser.getByteTimeDomainData(dataArray);
-        } else {
-          analyser.getByteFrequencyData(dataArray);
+      // Visualizer
+      const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      let srcNode, analyser;
+      function setupAnalyser() {
+        if (!srcNode) {
+          srcNode=audioCtx.createMediaElementSource(audioPlayer);
+          analyser=audioCtx.createAnalyser();
+          analyser.fftSize=256;
+          srcNode.connect(analyser);
+          analyser.connect(audioCtx.destination);
         }
-        ctx.clearRect(0, 0, audioCanvas.width, audioCanvas.height);
-        if (mode === "waveform") {
-          ctx.lineWidth = 2;
-          ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--accent-color');
+      }
+      setupAnalyser();
+      function drawViz() {
+        requestAnimationFrame(drawViz);
+        if (currentMediaType!=="audio") return;
+        const mode=vizSelect.value;
+        const len=(mode==="waveform"?analyser.fftSize:analyser.frequencyBinCount);
+        const data=new Uint8Array(len);
+        mode==="waveform"? analyser.getByteTimeDomainData(data)
+                         : analyser.getByteFrequencyData(data);
+        ctx.clearRect(0,0,audioCanvas.width,audioCanvas.height);
+        if (mode==="waveform") {
+          ctx.lineWidth=2;
+          ctx.strokeStyle=getComputedStyle(document.documentElement).getPropertyValue('--accent-color');
           ctx.beginPath();
-          const sliceWidth = audioCanvas.width / dataArray.length;
-          let x = 0;
-          for (let i = 0; i < dataArray.length; i++) {
-            const v = dataArray[i] / 128.0;
-            const y = v * audioCanvas.height / 2;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-            x += sliceWidth;
+          const slice=audioCanvas.width/data.length; let x=0;
+          for(let i=0;i<data.length;i++){
+            const v=data[i]/128, y=v*audioCanvas.height/2;
+            i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+            x+=slice;
           }
           ctx.stroke();
-        } else if (mode === "bars") {
-          const barWidth = (audioCanvas.width / bufferLength) * 2.5;
-          let x = 0;
-          for (let i = 0; i < bufferLength; i++) {
-            const barHeight = dataArray[i];
-            ctx.fillStyle = `rgb(${barHeight}, ${barHeight/2}, ${barHeight/3})`;
-            ctx.fillRect(x, audioCanvas.height - barHeight/2, barWidth, barHeight/2);
-            x += barWidth + 1;
+        } else if (mode==="bars") {
+          const w=(audioCanvas.width/len)*2.5; let x=0;
+          for(let i=0;i<len;i++){
+            const h=data[i];
+            ctx.fillStyle=`rgb(${h},${h/2},${h/3})`;
+            ctx.fillRect(x,audioCanvas.height-h/2,w,h/2);
+            x+=w+1;
           }
-        } else if (mode === "3d") {
-          const sliceWidth = audioCanvas.width / dataArray.length;
-          for (let i = 0; i < dataArray.length; i++) {
-            const v = dataArray[i] / 255;
-            const hue = v * 360;
-            ctx.fillStyle = `hsl(${hue},100%,50%)`;
-            ctx.fillRect(i * sliceWidth, audioCanvas.height * (1 - v), sliceWidth, audioCanvas.height * v);
+        } else if (mode==="3d") {
+          const slice=audioCanvas.width/data.length;
+          for(let i=0;i<data.length;i++){
+            const v=data[i]/255, hue=v*360;
+            ctx.fillStyle=`hsl(${hue},100%,50%)`;
+            ctx.fillRect(i*slice,audioCanvas.height*(1-v),slice,audioCanvas.height*v);
           }
-        } else if (mode === "circular") {
-          const radius = Math.min(audioCanvas.width, audioCanvas.height) / 4;
-          const cx = audioCanvas.width / 2;
-          const cy = audioCanvas.height / 2;
-          const angleStep = (Math.PI * 2) / bufferLength;
-          for (let i = 0; i < bufferLength; i++) {
-            const amplitude = dataArray[i] / 255;
-            const barHeight = amplitude * 50;
-            const angle = i * angleStep;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(angle);
-            ctx.fillStyle = `rgba(255,255,255,${amplitude})`;
-            ctx.fillRect(0, -2, barHeight, 4);
+        } else {
+          const radius=Math.min(audioCanvas.width,audioCanvas.height)/4;
+          const cx=audioCanvas.width/2, cy=audioCanvas.height/2;
+          const step=(Math.PI*2)/data.length;
+          for(let i=0;i<data.length;i++){
+            const amp=data[i]/255, len=amp*50, angle=i*step;
+            const x=cx+Math.cos(angle)*radius, y=cy+Math.sin(angle)*radius;
+            ctx.save(); ctx.translate(x,y); ctx.rotate(angle);
+            ctx.fillStyle=`rgba(255,255,255,${amp})`; ctx.fillRect(0,-2,len,4);
             ctx.restore();
           }
         }
       }
-      // Encourage aggressive buffering
-audioPlayer.preload = 'auto';
-audioPlayer.addEventListener('stalled', () => {
-  statusMessage.textContent = 'Buffering…';
-});
-      drawVisualizer();
-      function resizeCanvas() {
-        audioCanvas.width = audioCanvas.clientWidth || 300;
-        audioCanvas.height = audioCanvas.clientHeight || 240;
+      drawViz();
+      function resizeCanvas(){
+        audioCanvas.width=audioCanvas.clientWidth||300;
+        audioCanvas.height=audioCanvas.clientHeight||240;
       }
-      window.addEventListener("resize", resizeCanvas);
+      window.addEventListener("resize",resizeCanvas);
       resizeCanvas();
 
-      /* ===== Determine Media Type ===== */
-      function getMediaType(src) {
-        const ext = src.split('.').pop().toLowerCase();
-        const videoExts = ["mp4", "webm", "ogg"];
-        const audioExts = ["mp3", "flac", "wav", "aac"];
-        if (videoExts.includes(ext)) return "video";
-        else if (audioExts.includes(ext)) return "audio";
-        else return "audio";
+      // Helpers
+      function getMediaType(src){
+        const ext=src.split('.').pop().toLowerCase();
+        return ["mp4","webm","ogg"].includes(ext)?"video":"audio";
+      }
+      function formatTime(t){
+        if(isNaN(t))return"0:00";
+        const m=Math.floor(t/60), s=Math.floor(t%60).toString().padStart(2,"0");
+        return `${m}:${s}`;
       }
 
-      /* ===== Playback Functions ===== */
-      function playMedia(index, startTime = 0) {
-        currentIndex = index;
-        const track = songs[playlist[index]];
-        trackTitle.textContent = track.title;
-        trackMeta.textContent = track.meta;
-        const type = getMediaType(track.src);
-        currentMediaType = type;
-        audioPlayer.pause();
-        videoPlayer.pause();
-        // Remove the catch error from statusMessage to avoid false error messages
-        if (type === "audio") {
+      // Playback
+      function playMedia(i,start=0){
+        currentIndex=i;
+        const tr=songs[playlist[i]];
+        trackTitle.textContent=tr.title;
+        trackMeta.textContent=tr.meta;
+        const type=getMediaType(tr.src);
+        currentMediaType=type;
+        audioPlayer.pause(); videoPlayer.pause();
+        if(type==="audio"){
           audioPlayer.classList.remove("hidden");
           videoPlayer.classList.add("hidden");
           audioCanvas.classList.remove("hidden");
-          audioPlayer.src = track.src;
+          audioPlayer.src=tr.src;
           audioPlayer.load();
-          audioPlayer.currentTime = startTime;
-          audioPlayer.play().catch(err => console.error("Audio playback error", err));
+          audioPlayer.currentTime=start;
+          audioPlayer.play().catch(console.error);
         } else {
           videoPlayer.classList.remove("hidden");
           audioPlayer.classList.add("hidden");
           audioCanvas.classList.add("hidden");
-          videoPlayer.src = track.src;
+          videoPlayer.src=tr.src;
           videoPlayer.load();
-          videoPlayer.currentTime = startTime;
-          videoPlayer.play().catch(err => console.error("Video playback error", err));
+          videoPlayer.currentTime=start;
+          videoPlayer.play().catch(console.error);
         }
-        playBtn.style.display = "none";
-        pauseBtn.style.display = "inline-block";
-        statusMessage.textContent = "Playing...";
+        playBtn.style.display="none";
+        pauseBtn.style.display="inline-block";
+        statusMessage.textContent="Playing...";
       }
-      playBtn.addEventListener("click", () => {
-        if (currentMediaType === "audio") {
-          if (!audioPlayer.src) playMedia(currentIndex);
-          else audioPlayer.play().catch(err => console.error("Audio playback error", err));
+      playBtn.addEventListener("click",()=>{
+        if(currentMediaType==="audio"){
+          audioPlayer.src?audioPlayer.play().catch(console.error):playMedia(currentIndex);
         } else {
-          if (!videoPlayer.src) playMedia(currentIndex);
-          else videoPlayer.play().catch(err => console.error("Video playback error", err));
+          videoPlayer.src?videoPlayer.play().catch(console.error):playMedia(currentIndex);
         }
-        playBtn.style.display = "none";
-        pauseBtn.style.display = "inline-block";
+        playBtn.style.display="none"; pauseBtn.style.display="inline-block";
       });
-      pauseBtn.addEventListener("click", () => {
-        if (currentMediaType === "audio") audioPlayer.pause();
-        else videoPlayer.pause();
-        pauseBtn.style.display = "none";
-        playBtn.style.display = "inline-block";
+      pauseBtn.addEventListener("click",()=>{
+        (currentMediaType==="audio"?audioPlayer:videoPlayer).pause();
+        pauseBtn.style.display="none"; playBtn.style.display="inline-block";
       });
-      nextBtn.addEventListener("click", () => {
-        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex + 1) % songs.length;
+      nextBtn.addEventListener("click",()=>{
+        currentIndex=isShuffle?Math.floor(Math.random()*songs.length):(currentIndex+1)%songs.length;
         playMedia(currentIndex);
       });
-      prevBtn.addEventListener("click", () => {
-        currentIndex = isShuffle ? Math.floor(Math.random() * songs.length) : (currentIndex - 1 + songs.length) % songs.length;
+      prevBtn.addEventListener("click",()=>{
+        currentIndex=isShuffle?Math.floor(Math.random()*songs.length):(currentIndex-1+songs.length)%songs.length;
         playMedia(currentIndex);
       });
-      loopBtn.addEventListener("click", () => {
-        loopState = (loopState + 1) % 3;
-        loopBtn.textContent = loopState === 0 ? "Loop Off" : loopState === 1 ? "Repeat One" : "Repeat All";
+      loopBtn.addEventListener("click",()=>{
+        loopState=(loopState+1)%3;
+        loopBtn.textContent=loopState===0?"Loop Off":loopState===1?"Repeat One":"Repeat All";
       });
-      shuffleBtn.addEventListener("click", () => {
-        isShuffle = !isShuffle;
-        shuffleBtn.textContent = isShuffle ? "Shuffle On" : "Shuffle Off";
+      shuffleBtn.addEventListener("click",()=>{
+        isShuffle=!isShuffle;
+        shuffleBtn.textContent=isShuffle?"Shuffle On":"Shuffle Off";
       });
-      pipBtn.addEventListener("click", async () => {
-        if (document.pictureInPictureElement) {
-          await document.exitPictureInPicture();
-        } else if (currentMediaType === "video") {
-          await videoPlayer.requestPictureInPicture();
+      pipBtn.addEventListener("click",async()=>{
+        if(document.pictureInPictureElement)await document.exitPictureInPicture();
+        else if(currentMediaType==="video")await videoPlayer.requestPictureInPicture();
+      });
+      fullscreenBtn.addEventListener("click",()=>{
+        if(!document.fullscreenElement)displayContainer.requestFullscreen().catch(()=>statusMessage.textContent="Fullscreen error");
+        else document.exitFullscreen();
+      });
+      volumeSlider.addEventListener("input",()=>{
+        (currentMediaType==="audio"?audioPlayer:videoPlayer).volume=volumeSlider.value;
+        if(volumeSlider.value>0){ muteBtn.textContent="Mute"; }
+      });
+      muteBtn.addEventListener("click",()=>{
+        const p=(currentMediaType==="audio"?audioPlayer:videoPlayer);
+        p.muted=!p.muted; muteBtn.textContent=p.muted?"Unmute":"Mute";
+      });
+
+      // Progress & Seeking
+      function updateProgress(){
+        const p=(currentMediaType==="audio"?audioPlayer:videoPlayer);
+        if(p.duration){
+          const pct=(p.currentTime/p.duration)*100;
+          progressBar.style.width=pct+"%";
+          timeDisplay.textContent=`${formatTime(p.currentTime)} / ${formatTime(p.duration)}`;
         }
+      }
+      audioPlayer.addEventListener("timeupdate",updateProgress);
+      videoPlayer.addEventListener("timeupdate",updateProgress);
+      seekBar.addEventListener("click",e=>{
+        const rect=seekBar.getBoundingClientRect();
+        const pct=(e.clientX-rect.left)/seekBar.offsetWidth;
+        (currentMediaType==="audio"?audioPlayer:videoPlayer).currentTime=pct*(currentMediaType==="audio"?audioPlayer:videoPlayer).duration;
       });
-      fullscreenBtn.addEventListener("click", () => {
-        if (!document.fullscreenElement) {
-          displayContainer.requestFullscreen().catch(err => statusMessage.textContent = "Fullscreen error");
-        } else {
-          document.exitFullscreen();
-        }
+      seekBar.addEventListener("mousemove",e=>{
+        const rect=seekBar.getBoundingClientRect();
+        const pct=(e.clientX-rect.left)/seekBar.offsetWidth;
+        seekTooltip.textContent=formatTime(pct*(currentMediaType==="audio"?audioPlayer:videoPlayer).duration);
+        seekTooltip.style.left=(e.clientX-rect.left)+"px";
+        seekTooltip.style.display="block";
       });
-      volumeSlider.addEventListener("input", () => {
-        if (currentMediaType === "audio") audioPlayer.volume = volumeSlider.value;
-        else videoPlayer.volume = volumeSlider.value;
-        if (volumeSlider.value > 0) {
-          muted = false;
-          muteBtn.textContent = "Mute";
-        }
-      });
-      muteBtn.addEventListener("click", () => {
-        muted = !muted;
-        if (currentMediaType === "audio") audioPlayer.muted = muted;
-        else videoPlayer.muted = muted;
-        muteBtn.textContent = muted ? "Unmute" : "Mute";
-      });
-      loadURLBtn.addEventListener("click", () => {
-        const url = urlInput.value.trim();
-        if (url) {
-          songs.push({ title: url, src: url, meta: "Remote Stream" });
-          playlist.push(songs.length - 1);
+      seekBar.addEventListener("mouseout",()=>seekTooltip.style.display="none");
+
+      // Quick URL loading
+      loadURLBtn.addEventListener("click",()=>{
+        const u=urlInput.value.trim();
+        if(u){
+          songs.push({ title:u, src:u, meta:"Remote Stream" });
+          playlist.push(songs.length-1);
           populatePlaylist();
-          urlInput.value = "";
+          urlInput.value="";
         }
       });
-      function updateProgress() {
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        if (player.duration) {
-          const percent = (player.currentTime / player.duration) * 100;
-          progressBar.style.width = percent + "%";
-          timeDisplay.textContent = `${formatTime(player.currentTime)} / ${formatTime(player.duration)}`;
-        }
-      }
-      audioPlayer.addEventListener("timeupdate", updateProgress);
-      videoPlayer.addEventListener("timeupdate", updateProgress);
-      seekBar.addEventListener("click", (e) => {
-        const rect = seekBar.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        player.currentTime = (clickX / seekBar.offsetWidth) * player.duration;
-      });
-      seekBar.addEventListener("mousemove", (e) => {
-        const rect = seekBar.getBoundingClientRect();
-        const hoverX = e.clientX - rect.left;
-        const player = currentMediaType === "audio" ? audioPlayer : videoPlayer;
-        const time = (hoverX / seekBar.offsetWidth) * player.duration;
-        seekTooltip.textContent = formatTime(time);
-        seekTooltip.style.left = hoverX + "px";
-        seekTooltip.style.display = "block";
-      });
-      seekBar.addEventListener("mouseout", () => {
-        seekTooltip.style.display = "none";
-      });
-      function formatTime(time) {
-        if (isNaN(time)) return "0:00";
-        const minutes = Math.floor(time / 60);
-        const seconds = Math.floor(time % 60).toString().padStart(2, "0");
-        return `${minutes}:${seconds}`;
-      }
-      function handleMediaEnd() {
-        if (loopState === 1) playMedia(currentIndex);
-        else nextBtn.click();
-      }
-      audioPlayer.addEventListener("ended", handleMediaEnd);
-      videoPlayer.addEventListener("ended", handleMediaEnd);
-      document.addEventListener("keydown", (e) => {
-        switch (e.key) {
-          case " ":
-            e.preventDefault();
-            (currentMediaType === "audio" ? audioPlayer.paused : videoPlayer.paused) ? playBtn.click() : pauseBtn.click();
-            break;
-          case "ArrowRight":
-            nextBtn.click();
-            break;
-          case "ArrowLeft":
-            prevBtn.click();
-            break;
+
+      // Keyboard shortcuts
+      document.addEventListener("keydown",e=>{
+        switch(e.key){
+          case " ": e.preventDefault(); (currentMediaType==="audio"?audioPlayer:videoPlayer).paused?playBtn.click():pauseBtn.click(); break;
+          case "ArrowRight": nextBtn.click(); break;
+          case "ArrowLeft": prevBtn.click(); break;
           case "ArrowUp":
-            volumeSlider.value = Math.min(parseFloat(volumeSlider.value) + 0.1, 1);
+            volumeSlider.value=Math.min(parseFloat(volumeSlider.value)+0.1,1);
             volumeSlider.dispatchEvent(new Event("input"));
             break;
           case "ArrowDown":
-            volumeSlider.value = Math.max(parseFloat(volumeSlider.value) - 0.1, 0);
+            volumeSlider.value=Math.max(parseFloat(volumeSlider.value)-0.1,0);
             volumeSlider.dispatchEvent(new Event("input"));
             break;
         }
       });
-      playMedia(currentIndex, savedTime ? parseFloat(savedTime) : 0);
-      /* ===== File Upload & Drag-and-Drop ===== */
-      uploadArea.addEventListener("click", () => fileInput.click());
-      uploadArea.addEventListener("dragover", (e) => { e.preventDefault(); });
-      uploadArea.addEventListener("drop", (e) => {
-        e.preventDefault();
-        handleFiles(e.dataTransfer.files);
+
+      // File upload / drag & drop
+      uploadArea.addEventListener("click",()=>fileInput.click());
+      uploadArea.addEventListener("dragover",e=>e.preventDefault());
+      uploadArea.addEventListener("drop",e=>{
+        e.preventDefault(); handleFiles(e.dataTransfer.files);
       });
-      fileInput.addEventListener("change", (e) => {
-        handleFiles(e.target.files);
-      });
-      function handleFiles(files) {
-        Array.from(files).forEach(file => {
-          const url = URL.createObjectURL(file);
-          songs.push({ title: file.name, src: url, meta: "Local File" });
-          playlist.push(songs.length - 1);
+      fileInput.addEventListener("change",e=>handleFiles(e.target.files));
+      function handleFiles(files){
+        Array.from(files).forEach(f=>{
+          const url=URL.createObjectURL(f);
+          songs.push({ title:f.name, src:url, meta:"Local File" });
+          playlist.push(songs.length-1);
         });
         populatePlaylist();
       }
-if (type === "audio") {
-  ...
-  audioPlayer.src = track.src;
-  audioPlayer.load();
-  setupAudioAnalyser(); // <-- ADD THIS
-  ...
-}
-      /* ===== Scan Local Media Feature ===== */
-      // Always show the scan button. Even if the API isn't supported, the button remains.
-      scanLocalBtn.addEventListener("click", async () => {
+
+      // Scan Local Media
+      scanLocalBtn.addEventListener("click",async()=>{
         try {
-          // Attempt to use the directory picker (if available)
-          if (window.showDirectoryPicker) {
-            const dirHandle = await window.showDirectoryPicker();
-            for await (const entry of dirHandle.values()) {
-              if (entry.kind === "file") {
-                const fileName = entry.name;
-                const ext = fileName.split('.').pop().toLowerCase();
-                const audioExts = ["mp3", "flac", "wav", "aac"];
-                const videoExts = ["mp4", "webm", "ogg"];
-                if (audioExts.includes(ext) || videoExts.includes(ext)) {
-                  const file = await entry.getFile();
-                  const url = URL.createObjectURL(file);
-                  songs.push({ title: fileName, src: url, meta: "Local File" });
-                  playlist.push(songs.length - 1);
+          if(window.showDirectoryPicker){
+            const dir=await window.showDirectoryPicker();
+            for await(const entry of dir.values()){
+              if(entry.kind==="file"){
+                const name=entry.name;
+                const ext=name.split('.').pop().toLowerCase();
+                if(["mp3","flac","wav","aac","mp4","webm","ogg"].includes(ext)){
+                  const file=await entry.getFile();
+                  const url=URL.createObjectURL(file);
+                  songs.push({ title:name, src:url, meta:"Local File" });
+                  playlist.push(songs.length-1);
                 }
               }
             }
             populatePlaylist();
-            statusMessage.textContent = "Local media scanned and added.";
+            statusMessage.textContent="Local media scanned and added.";
           } else {
-            // Fallback message if the API isn't supported.
-            statusMessage.textContent = "Local directory access not supported in this browser.";
+            statusMessage.textContent="Local directory access not supported in this browser.";
           }
-        } catch (err) {
-          statusMessage.textContent = "Failed to access local media: " + err.message;
+        } catch(err){
+          statusMessage.textContent="Failed to access local media: "+err.message;
         }
       });
+
     });
   </script>
 </body>
