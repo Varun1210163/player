@@ -409,6 +409,13 @@
   <!-- Hidden Audio Element -->
   <audio id="audio-player" class="hidden"></audio>
   <script>
+    // Resume locked Web Audio on first user gesture
+document.body.addEventListener('click', () => {
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+    console.log('AudioContext resumed');
+  }
+}, { once: true });
     document.addEventListener("DOMContentLoaded", () => {
       /* ===== DOM Elements ===== */
       const videoPlayer = document.getElementById("video-player");
