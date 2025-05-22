@@ -818,7 +818,13 @@
         });
         populatePlaylist();
       }
-
+if (type === "audio") {
+  ...
+  audioPlayer.src = track.src;
+  audioPlayer.load();
+  setupAudioAnalyser(); // <-- ADD THIS
+  ...
+}
       /* ===== Scan Local Media Feature ===== */
       // Always show the scan button. Even if the API isn't supported, the button remains.
       scanLocalBtn.addEventListener("click", async () => {
