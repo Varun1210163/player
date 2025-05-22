@@ -542,13 +542,16 @@
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       let sourceNode, analyser;
       function setupAudioAnalyser() {
-        if (!sourceNode) {
-          sourceNode = audioCtx.createMediaElementSource(audioPlayer);
-          analyser = audioCtx.createAnalyser();
-          analyser.fftSize = 256;
-          sourceNode.connect(analyser);
-          analyser.connect(audioCtx.destination);
-        }
+        function setupAudioAnalyser() {
+  if (sourceNode) {
+    sourceNode.disconnect();
+  }
+  sourceNode = audioCtx.createMediaElementSource(audioPlayer);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  sourceNode.connect(analyser);
+  analyser.connect(audioCtx.destination);
+}
       }
       setupAudioAnalyser();
       function drawVisualizer() {
