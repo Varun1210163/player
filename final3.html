@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Varun’s Waveform Media Player</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body {
+      margin: 0; padding: 2rem;
+      color: white;
+      background: linear-gradient(270deg, #ff0080, #7928ca, #2afadf, #ff8c00, #40e0d0);
+      background-size: 1000% 1000%;
+      animation: bgShift 20s infinite linear;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    @keyframes bgShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    h1 { font-size: 2rem; margin-bottom: 1rem; text-align: center; }
+    #now-playing { font-weight: bold; margin-bottom: 0.5rem; }
+    #visualizer {
+      width: 100%; max-width: 600px; height: 80px;
+      background: rgba(0,0,0,0.2); border-radius: 12px;
+    }
+    #controls {
+      display: flex; gap: 1rem; align-items: center; margin: 1rem 0;
+    }
+    button {
+      font-size: 1.5rem; padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
+      color: white; cursor: pointer; transition: background 0.3s;
+    }
+    button:hover { background: rgba(255,255,255,0.3); }
+    #seek-slider {
+      width: 100%; max-width: 600px;
+      margin: 0.5rem 0; cursor: pointer;
+    }
+    #media-list { max-width: 600px; width: 100%; }
+    .media-item {
+      padding: 0.75rem 1rem; margin: 0.25rem 0;
+      background: rgba(255,255,255,0.1); border-radius: 8px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .media-item:hover { background: rgba(255,255,255,0.2); }
+    .media-item.active {
+      background: rgba(255,255,255,0.3); font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Varun’s Waveform Media Player</h1>
+  <div id="now-playing">Loading...</div>
+
+  <audio id="media-player" crossorigin="anonymous"></audio>
+  <canvas id="visualizer"></canvas>
+
+  <input type="range" id="seek-slider" min="0" max="100" value="0">
+
+  <div id="controls">
+    <button id="skip-prev">⏮️</button>
+    <button id="play-pause">▶️</button>
+    <button id="skip-next">⏭️</button>
+    <button id="shuffle-loop">Mode: Off</button>
+  </div>
+
+  <div id="media-list"></div>
+
+  <script>
+    const username = "varun1210163", repo = "music";
+    const player = document.getElementById("media-player"),
+          playPauseBtn = document.getElementById("play-pause"),
+          nowPlaying = document.getElementById("now-playing"),
+          mediaList = document.getElementById("media-list"),
+          canvas = document.getElementById("visualizer"),
+          skipNextBtn = document.getElementById("skip-next"),
+          skipPrevBtn = document.getElementById("skip-prev"),
+          loopBtn = document.getElementById("shuffle-loop"),
+          seekSlider = document.getElementById("seek-slider"),
+          ctx = canvas.getContext("2d");
+
+    let files = [], index = 0, mode = 0;
+    const modeNames = ["Off","Loop One","Loop All","Shuffle"];
+    loopBtn.onclick = () => {
+      mode = (mode + 1) % 4;
+      loopBtn.textContent = `Mode: ${modeNames[mode]}`;
+    };
+
+    function updateNow(name) {
+      nowPlaying.textContent = `Now playing: ${name}`;
+      [...mediaList.children].forEach((item,i)=>item.classList.toggle("active",i===index));
+    }
+    function playFile(file) {
+      player.src = file.download_url;
+      player.play();
+      updateNow(file.name);
+    }
+    function playIndex(i) {
+      index = i; playFile(files[index]);
+    }
+    function nextTrack() {
+      if(mode===3){
+        let r; do{ r=Math.floor(Math.random()*files.length);}while(r===index&&files.length>1);
+        index=r;
+      } else if(mode===1){
+        // loop one → keep same index
+      } else {
+        index = (index + 1) % files.length;
+        if(mode===0 && index===0) return; 
+      }
+      playIndex(index);
+    }
+    function prevTrack(){
+      index = (index-1+files.length)%files.length;
+      playIndex(index);
+    }
+
+    playPauseBtn.onclick = () => {
+      if(player.paused) player.play(); else player.pause();
+    };
+    skipNextBtn.onclick = nextTrack;
+    skipPrevBtn.onclick = prevTrack;
+
+    player.onplay = ()=> playPauseBtn.textContent="⏸️";
+    player.onpause = ()=> playPauseBtn.textContent="▶️";
+
+    // Seek slider events
+    player.ontimeupdate = ()=>{
+      if(!player.duration) return;
+      const pct = (player.currentTime/player.duration)*100;
+      seekSlider.value = pct;
+    };
+    seekSlider.oninput = ()=>{
+      if(!player.duration) return;
+      player.currentTime = (seekSlider.value/100)*player.duration;
+    };
+
+    // Fetch playlist
+    async function fetchFiles(){
+      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/`);
+      const data = await res.json();
+      files = data.filter(f=>f.name.match(/\.(mp3|mp4)$/i));
+      mediaList.innerHTML = "";
+      files.forEach((f,i)=>{
+        const d = document.createElement("div");
+        d.className="media-item";
+        d.textContent=f.name;
+        d.onclick=()=>playIndex(i);
+        mediaList.appendChild(d);
+      });
+      if(files.length) playIndex(0);
+    }
+
+    // Waveform Visualizer
+    const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const analyser=audioCtx.createAnalyser();
+    const src=audioCtx.createMediaElementSource(player);
+    src.connect(analyser); analyser.connect(audioCtx.destination);
+    analyser.fftSize=128;
+    const bufLen=analyser.frequencyBinCount;
+    const dataArr=new Uint8Array(bufLen);
+    function draw(){
+      requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(dataArr);
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      const barWidth=canvas.width/bufLen;
+      for(let i=0;i<bufLen;i++){
+        const h=dataArr[i]/255*canvas.height;
+        ctx.fillStyle=`hsl(${i/bufLen*360},100%,60%)`;
+        ctx.fillRect(i*barWidth,canvas.height-h,barWidth,h);
+      }
+    }
+    player.onplay = ()=>{
+      audioCtx.resume();
+      draw();
+      playPauseBtn.textContent="⏸️";
+    };
+    player.onpause = ()=> playPauseBtn.textContent="▶️";
+
+    fetchFiles();
+  </script>
+</body>
+</html>
