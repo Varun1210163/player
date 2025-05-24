@@ -205,10 +205,113 @@
     <div id="playlist">Loading media...</div>
   </div>
 
-  <script>
-  (()=>{
-  })();
-  </script>
+    <script>
+  // Variables
+  const audio1 = document.getElementById("audio1");
+  const audio2 = document.getElementById("audio2");
+  const playPauseBtn = document.getElementById("play-pause");
+  const nextBtn = document.getElementById("next");
+  const prevBtn = document.getElementById("prev");
+  const seekbar = document.getElementById("seekbar");
+  const playlist = document.getElementById("playlist");
+  const tracks = [
+    { title: "Track 1", src: "path/to/track1.mp3" },
+    { title: "Track 2", src: "path/to/track2.mp3" },
+    { title: "Track 3", src: "path/to/track3.mp3" },
+  ];
+  let currentIndex = 0;
+  let currentAudio = audio1;
+
+  // Initialize Playlist
+  function updatePlaylist() {
+    playlist.innerHTML = '';
+    tracks.forEach((track, index) => {
+      const trackElement = document.createElement('div');
+      trackElement.textContent = track.title;
+      trackElement.onclick = () => loadTrack(index);
+      playlist.appendChild(trackElement);
+    });
+  }
+
+  // Load Track
+  function loadTrack(index) {
+    if (index === currentIndex) return;
+    currentIndex = index;
+    const nextTrack = tracks[index];
+
+    // Crossfade Logic
+    const nextAudio = currentAudio === audio1 ? audio2 : audio1;
+    nextAudio.src = nextTrack.src;
+    nextAudio.load();
+    nextAudio.play();
+
+    fadeOut(currentAudio);
+    fadeIn(nextAudio);
+
+    currentAudio = nextAudio;
+  }
+
+  // Fade Out
+  function fadeOut(audio) {
+    let volume = 1;
+    const fadeInterval = setInterval(() => {
+      volume -= 0.05;
+      audio.volume = volume;
+      if (volume <= 0) {
+        clearInterval(fadeInterval);
+        audio.pause();
+      }
+    }, 50);
+  }
+
+  // Fade In
+  function fadeIn(audio) {
+    audio.volume = 0;
+    let volume = 0;
+    const fadeInterval = setInterval(() => {
+      volume += 0.05;
+      audio.volume = volume;
+      if (volume >= 1) {
+        clearInterval(fadeInterval);
+      }
+    }, 50);
+  }
+
+  // Play/Pause Button
+  playPauseBtn.addEventListener("click", () => {
+    if (currentAudio.paused) {
+      currentAudio.play();
+      playPauseBtn.textContent = "⏸️"; // Pause
+    } else {
+      currentAudio.pause();
+      playPauseBtn.textContent = "▶️"; // Play
+    }
+  });
+
+  // Next and Previous Buttons
+  nextBtn.addEventListener("click", () => {
+    const nextIndex = (currentIndex + 1) % tracks.length;
+    loadTrack(nextIndex);
+  });
+
+  prevBtn.addEventListener("click", () => {
+    const prevIndex = (currentIndex - 1 + tracks.length) % tracks.length;
+    loadTrack(prevIndex);
+  });
+
+  // Seekbar Update
+  currentAudio.addEventListener('timeupdate', () => {
+    seekbar.value = (currentAudio.currentTime / currentAudio.duration) * 100;
+  });
+
+  seekbar.addEventListener('input', () => {
+    currentAudio.currentTime = (seekbar.value / 100) * currentAudio.duration;
+  });
+
+  // Load initial track
+  loadTrack(0);
+  updatePlaylist();
+</script>
 
 </body>
 </html>
