@@ -1,446 +1,214 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Varun’s Personal Audio Player</title>
-<style>
- /* styles.css */
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Varun’s Personal Audio Player</title>
+  <style>
+    /* === Google Font === */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-/* === Google Font === */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+    /* === Neon Color Palette === */
+    :root {
+      --neon-magenta: #ff00ff;
+      --neon-cyan:    #00ffff;
+      --neon-yellow:  #ffff00;
+      --neon-purple:  #8a2be2;
+      --neon-green:   #00ff7f;
+    }
 
-/* === Neon Color Palette === */
-:root {
-  --neon-magenta: #ff00ff;
-  --neon-cyan:    #00ffff;
-  --neon-yellow:  #ffff00;
-  --neon-purple:  #8a2be2;
-  --neon-green:   #00ff7f;
-}
+    /* === Reset & Box Sizing === */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* === Global & Background === */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+    /* === Body & Infinite Gradient === */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(
+        -45deg,
+        var(--neon-magenta),
+        var(--neon-cyan),
+        var(--neon-yellow),
+        var(--neon-purple),
+        var(--neon-green)
+      );
+      background-size: 1000% 1000%;
+      animation: neonShift 25s ease infinite;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+    }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(
-    -45deg,
-    var(--neon-magenta),
-    var(--neon-cyan),
-    var(--neon-yellow),
-    var(--neon-purple),
-    var(--neon-green)
-  );
-  background-size: 1000% 1000%;
-  animation: neonShift 25s ease infinite;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-}
+    @keyframes neonShift {
+      0%   { background-position:   0%  50%; }
+      25%  { background-position:  50% 100%; }
+      50%  { background-position: 100%  50%; }
+      75%  { background-position:  50%   0%; }
+      100% { background-position:   0%  50%; }
+    }
 
-/* === Gradient Animation === */
-@keyframes neonShift {
-  0%   { background-position:   0%  50%; }
-  25%  { background-position:  50% 100%; }
-  50%  { background-position: 100%  50%; }
-  75%  { background-position:  50%   0%; }
-  100% { background-position:   0%  50%; }
-}
+    /* === Player Container === */
+    #player-container {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid var(--neon-cyan);
+      border-radius: 16px;
+      box-shadow: 0 0 20px var(--neon-cyan);
+      max-width: 640px;
+      width: 100%;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    #player-container:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px var(--neon-magenta);
+    }
 
-/* === Player Container === */
-#player-container {
-  background: rgba(0, 0, 0, 0.5);
-  border: 2px solid var(--neon-cyan);
-  border-radius: 16px;
-  box-shadow: 0 0 20px var(--neon-cyan);
-  max-width: 640px;
-  width: 100%;
-  padding: 1.5rem;
-  transition: transform 0.3s ease;
-}
-#player-container:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0 30px var(--neon-magenta);
-}
+    /* === Heading === */
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 8px var(--neon-yellow);
+      text-align: center;
+    }
 
-/* === Heading === */
-h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  text-shadow: 0 0 8px var(--neon-yellow);
-  text-align: center;
-}
+    /* === Controls === */
+    #controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    button {
+      background: transparent;
+      border: 2px solid var(--neon-magenta);
+      border-radius: 50%;
+      color: var(--neon-magenta);
+      cursor: pointer;
+      font-size: 1.4rem;
+      padding: 0.6rem 0.8rem;
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      background: var(--neon-magenta);
+      color: #111;
+      box-shadow: 0 0 12px var(--neon-magenta);
+    }
 
-/* === Controls === */
-#controls {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
+    /* === Seekbar === */
+    #seekbar {
+      width: 100%;
+      margin: 0.75rem 0;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--neon-yellow);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    input[type=range]:hover {
+      background: var(--neon-cyan);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      background: var(--neon-magenta);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--neon-magenta);
+      cursor: pointer;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
 
-button {
-  background: transparent;
-  border: 2px solid var(--neon-magenta);
-  border-radius: 50%;
-  color: var(--neon-magenta);
-  cursor: pointer;
-  font-size: 1.4rem;
-  padding: 0.6rem 0.8rem;
-  transition: all 0.2s ease;
-}
-button:hover {
-  background: var(--neon-magenta);
-  color: #111;
-  box-shadow: 0 0 12px var(--neon-magenta);
-}
+    /* === Playlist === */
+    #playlist {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--neon-green);
+      border-radius: 12px;
+      max-height: 240px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+    #playlist div {
+      padding: 0.5rem 1rem;
+      margin-bottom: 0.25rem;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    #playlist div:hover {
+      background: var(--neon-green);
+      color: #111;
+    }
+    #playlist .active {
+      background: var(--neon-cyan);
+      font-weight: 600;
+      color: #111;
+    }
 
-/* === Seekbar === */
-#seekbar {
-  width: 100%;
-  margin: 0.75rem 0;
-}
-input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 6px;
-  background: var(--neon-yellow);
-  border-radius: 3px;
-  outline: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-input[type=range]:hover {
-  background: var(--neon-cyan);
-}
-input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--neon-magenta);
-  border-radius: 50%;
-  box-shadow: 0 0 8px var(--neon-magenta);
-  cursor: pointer;
-  transition: transform 0.1s ease;
-}
-input[type=range]::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-}
+    /* === Scrollbar Styling === */
+    #playlist::-webkit-scrollbar {
+      width: 8px;
+    }
+    #playlist::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+    }
+    #playlist::-webkit-scrollbar-thumb {
+      background: var(--neon-magenta);
+      border-radius: 4px;
+    }
 
-/* === Playlist === */
-#playlist {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid var(--neon-green);
-  border-radius: 12px;
-  max-height: 240px;
-  overflow-y: auto;
-  padding: 0.5rem;
-}
-#playlist div {
-  padding: 0.5rem 1rem;
-  margin-bottom: 0.25rem;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: background 0.2s, color 0.2s;
-}
-#playlist div:hover {
-  background: var(--neon-green);
-  color: #111;
-}
-#playlist .active {
-  background: var(--neon-cyan);
-  font-weight: 600;
-  color: #111;
-}
-
-/* === Scrollbar Styling === */
-#playlist::-webkit-scrollbar {
-  width: 8px;
-}
-#playlist::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
-#playlist::-webkit-scrollbar-thumb {
-  background: var(--neon-magenta);
-  border-radius: 4px;
-}
-
-/* === Responsive === */
-@media (max-width: 600px) {
-  #player-container {
-    padding: 1rem;
-  }
-  button {
-    font-size: 1.2rem;
-    padding: 0.5rem;
-  }
-}
-</style>
+    /* === Responsive === */
+    @media (max-width: 600px) {
+      #player-container {
+        padding: 1rem;
+      }
+      button {
+        font-size: 1.2rem;
+        padding: 0.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<h1>Varun’s Crossfade Audio Player</h1>
+  <h1>Varun’s Crossfade Audio Player</h1>
 
-<div id="player-container">
-  <!-- Two audio elements for crossfade -->
-  <audio id="audio1" preload="auto" crossorigin="anonymous"></audio>
-  <audio id="audio2" preload="auto" crossorigin="anonymous"></audio>
+  <div id="player-container">
+    <!-- Two audio elements for crossfade -->
+    <audio id="audio1" preload="auto" crossorigin="anonymous"></audio>
+    <audio id="audio2" preload="auto" crossorigin="anonymous"></audio>
 
-  <div id="controls">
-    <button id="prev" title="Previous">⏮️</button>
-    <button id="play-pause" title="Play/Pause">▶️</button>
-    <button id="next" title="Next">⏭️</button>
-    <button id="loop-btn" title="Loop Mode">🔁</button>
-    <button id="shuffle-btn" title="Shuffle">🔀</button>
+    <div id="controls">
+      <button id="prev" title="Previous">⏮️</button>
+      <button id="play-pause" title="Play/Pause">▶️</button>
+      <button id="next" title="Next">⏭️</button>
+      <button id="loop-btn" title="Loop Mode">🔁</button>
+      <button id="shuffle-btn" title="Shuffle">🔀</button>
+    </div>
+
+    <input type="range" id="seekbar" value="0" min="0" max="100" step="0.1" />
+
+    <div id="playlist">Loading media...</div>
   </div>
 
-  <input type="range" id="seekbar" value="0" min="0" max="100" step="0.1" />
-
-  <div id="playlist">Loading media...</div>
-</div>
-
-<script>
-(() => {
-  const username = "varun1210163";
-  const repo = "music";
-
-  const audio1 = document.getElementById("audio1");
-  const audio2 = document.getElementById("audio2");
-  const playPauseBtn = document.getElementById("play-pause");
-  const prevBtn = document.getElementById("prev");
-  const nextBtn = document.getElementById("next");
-  const loopBtn = document.getElementById("loop-btn");
-  const shuffleBtn = document.getElementById("shuffle-btn");
-  const seekbar = document.getElementById("seekbar");
-  const playlistDiv = document.getElementById("playlist");
-
-  let audioNodes = [audio1, audio2];
-  let currentAudio = 0; // index of active audio element
-  let isPlaying = false;
-
-  // Loop modes: 0=loop off,1=loop all,2=loop one,3=shuffle
-  let loopMode = 0;
-  let shuffle = false;
-
-  let tracks = [];
-  let currentIndex = 0;
-
-  // Fade config
-  const fadeTime = 2; // seconds
-  const fadeInterval = 50; // ms
-
-  // Crossfade function: fade out old, fade in new
-  function crossfadeToTrack(index) {
-    if (index < 0 || index >= tracks.length) return;
-
-    let nextAudio = 1 - currentAudio;
-    let oldAudio = currentAudio;
-
-    const nextTrack = tracks[index];
-    let volumeStep = 1 / (fadeTime * 1000 / fadeInterval);
-    let fadeOutVol = 1;
-    let fadeInVol = 0;
-
-    // Prepare next audio element
-    audioNodes[nextAudio].src = nextTrack.download_url;
-    audioNodes[nextAudio].currentTime = 0;
-    audioNodes[nextAudio].volume = 0;
-    audioNodes[nextAudio].play();
-
-    // Start fading
-    const fadeTimer = setInterval(() => {
-      fadeOutVol -= volumeStep;
-      fadeInVol += volumeStep;
-      if (fadeOutVol <= 0) {
-        fadeOutVol = 0;
-        fadeInVol = 1;
-        clearInterval(fadeTimer);
-        audioNodes[oldAudio].pause();
-        audioNodes[oldAudio].src = "";
-      }
-      audioNodes[oldAudio].volume = fadeOutVol;
-      audioNodes[nextAudio].volume = fadeInVol;
-    }, fadeInterval);
-
-    currentAudio = nextAudio;
-    currentIndex = index;
-    highlightActiveTrack();
-
-    isPlaying = true;
-    playPauseBtn.textContent = "⏯️";
-  }
-
-  // Highlight the current track in the playlist
-  function highlightActiveTrack() {
-    const items = playlistDiv.querySelectorAll("div");
-    items.forEach((item, i) => {
-      if(i === currentIndex) item.classList.add("active");
-      else item.classList.remove("active");
-    });
-  }
-
-  // Play/pause toggle
-  function togglePlayPause() {
-    if (isPlaying) {
-      audioNodes[currentAudio].pause();
-      playPauseBtn.textContent = "▶️";
-      isPlaying = false;
-    } else {
-      audioNodes[currentAudio].play();
-      playPauseBtn.textContent = "⏯️";
-      isPlaying = true;
-    }
-  }
-
-  // Next track logic with loop/shuffle
-  function nextTrack() {
-    if (shuffle) {
-      let nextIdx;
-      do {
-        nextIdx = Math.floor(Math.random() * tracks.length);
-      } while (nextIdx === currentIndex && tracks.length > 1);
-      crossfadeToTrack(nextIdx);
-    } else {
-      if (loopMode === 2) { // Loop one
-        crossfadeToTrack(currentIndex);
-      } else {
-        let nextIdx = currentIndex + 1;
-        if (nextIdx >= tracks.length) {
-          if (loopMode === 1) nextIdx = 0; // Loop all
-          else return pauseAndReset();
-        }
-        crossfadeToTrack(nextIdx);
-      }
-    }
-  }
-
-  // Previous track
-  function prevTrack() {
-    let prevIdx = currentIndex - 1;
-    if (prevIdx < 0) prevIdx = tracks.length - 1;
-    crossfadeToTrack(prevIdx);
-  }
-
-  // Pause and reset UI
-  function pauseAndReset() {
-    audioNodes[currentAudio].pause();
-    playPauseBtn.textContent = "▶️";
-    isPlaying = false;
-  }
-
-  // Update seekbar while playing
-  function updateSeekbar() {
-    const audio = audioNodes[currentAudio];
-    if (!audio.duration) return;
-    seekbar.max = audio.duration;
-    seekbar.value = audio.currentTime;
-  }
-
-  // Seek audio position from slider
-  seekbar.addEventListener("input", () => {
-    audioNodes[currentAudio].currentTime = seekbar.value;
-  });
-
-  // Loop button cycle through modes
-  loopBtn.addEventListener("click", () => {
-    loopMode = (loopMode + 1) % 4; // 0-3
-    shuffle = loopMode === 3;
-    updateLoopButton();
-  });
-
-  function updateLoopButton() {
-    switch(loopMode) {
-      case 0: loopBtn.textContent = "🔁 Off"; break;
-      case 1: loopBtn.textContent = "🔂 All"; break;
-      case 2: loopBtn.textContent = "🔂 One"; break;
-      case 3: loopBtn.textContent = "🔀 Shuffle"; break;
-    }
-  }
-  updateLoopButton();
-
-  // Shuffle button toggles shuffle mode
-  shuffleBtn.addEventListener("click", () => {
-    shuffle = !shuffle;
-    loopMode = shuffle ? 3 : 0;
-    updateLoopButton();
-  });
-
-  // Play/pause button
-  playPauseBtn.addEventListener("click", togglePlayPause);
-  prevBtn.addEventListener("click", prevTrack);
-  nextBtn.addEventListener("click", nextTrack);
-
-  // Automatically go to next track when current ends (no crossfade here)
-  audio1.addEventListener("ended", () => {
-    if (currentAudio === 0) nextTrack();
-  });
-  audio2.addEventListener("ended", () => {
-    if (currentAudio === 1) nextTrack();
-  });
-
-  // Load playlist from GitHub API
-  async function loadPlaylist() {
-    playlistDiv.textContent = "Loading media...";
-    try {
-      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
-      const res = await fetch(apiUrl);
-      const data = await res.json();
-      tracks = data.filter(f => /\.(mp3|mp4)$/i.test(f.name));
-
-      if (tracks.length === 0) {
-        playlistDiv.textContent = "No audio files found.";
-        return;
-      }
-
-      playlistDiv.innerHTML = "";
-      tracks.forEach((track, i) => {
-        const div = document.createElement("div");
-        div.textContent = track.name;
-        div.addEventListener("click", () => {
-          if (i !== currentIndex) crossfadeToTrack(i);
-        });
-        playlistDiv.appendChild(div);
-      });
-
-      // Start with first track
-      crossfadeToTrack(0);
-    } catch(e) {
-      playlistDiv.textContent = "Failed to load playlist.";
-      console.error(e);
-    }
-  }
-
-  // Update seekbar on timeupdate
-  function setupSeekbarUpdater() {
-    audioNodes.forEach(audio => {
-      audio.addEventListener("timeupdate", updateSeekbar);
-    });
-  }
-  setupSeekbarUpdater();
-
-  loadPlaylist();
-
-  // Background color changer (slowly cycles colors)
-  const colors = [
-    '#ff6f61', '#f7d794', '#778beb', '#e77f67', '#f8a5c2'
-  ];
-  let colorIndex = 0;
-  setInterval(() => {
-    colorIndex = (colorIndex + 1) % colors.length;
-    document.body.style.background = `linear-gradient(135deg, ${colors[colorIndex]}, ${colors[(colorIndex+1)%colors.length]})`;
-  }, 10000);
-
-})();
-</script>
+  <script>
+  (()=>{
+  })();
+  </script>
 
 </body>
 </html>
