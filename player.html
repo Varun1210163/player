@@ -1,185 +1,365 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Varun’s Waveform Media Player</title>
-  <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-    body {
-      margin: 0; padding: 2rem;
-      color: white;
-      background: linear-gradient(270deg, #ff0080, #7928ca, #2afadf, #ff8c00, #40e0d0);
-      background-size: 1000% 1000%;
-      animation: bgShift 20s infinite linear;
-      display: flex; flex-direction: column; align-items: center;
-    }
-    @keyframes bgShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    h1 { font-size: 2rem; margin-bottom: 1rem; text-align: center; }
-    #now-playing { font-weight: bold; margin-bottom: 0.5rem; }
-    #visualizer {
-      width: 100%; max-width: 600px; height: 80px;
-      background: rgba(0,0,0,0.2); border-radius: 12px;
-    }
-    #controls {
-      display: flex; gap: 1rem; align-items: center; margin: 1rem 0;
-    }
-    button {
-      font-size: 1.5rem; padding: 0.5rem 1rem;
-      background: rgba(255,255,255,0.1); border: none; border-radius: 8px;
-      color: white; cursor: pointer; transition: background 0.3s;
-    }
-    button:hover { background: rgba(255,255,255,0.3); }
-    #seek-slider {
-      width: 100%; max-width: 600px;
-      margin: 0.5rem 0; cursor: pointer;
-    }
-    #media-list { max-width: 600px; width: 100%; }
-    .media-item {
-      padding: 0.75rem 1rem; margin: 0.25rem 0;
-      background: rgba(255,255,255,0.1); border-radius: 8px;
-      cursor: pointer; transition: background 0.2s;
-    }
-    .media-item:hover { background: rgba(255,255,255,0.2); }
-    .media-item.active {
-      background: rgba(255,255,255,0.3); font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Varun’s GitHub Crossfade Audio Player</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+  :root {
+    --color1: #ff6f61;
+    --color2: #f7d794;
+    --color3: #778beb;
+    --color4: #e77f67;
+    --color5: #f8a5c2;
+  }
+  body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(270deg, #ff6f61, #f7d794, #778beb, #e77f67, #f8a5c2);
+  background-size: 1000% 1000%;
+  animation: gradientShift 30s ease infinite;
+  color: white;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+  h1 {
+    margin-bottom: 0.2rem;
+  }
+  #player-container {
+    background: rgba(255 255 255 / 0.1);
+    border-radius: 16px;
+    padding: 1rem 2rem;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+  }
+  #playlist {
+    margin-top: 1.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 12px;
+    background: rgba(255 255 255 / 0.05);
+    padding: 0.5rem;
+  }
+  #playlist div {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  #playlist div:hover {
+    background: var(--color5);
+    color: #111;
+  }
+  #playlist .active {
+    background: var(--color4);
+    font-weight: 600;
+    color: #111;
+  }
+  button {
+    background: var(--color5);
+    border: none;
+    border-radius: 50%;
+    padding: 0.6rem 0.75rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    font-size: 1.3rem;
+    color: #111;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: var(--color1);
+    color: white;
+  }
+  #controls {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #seekbar {
+    width: 100%;
+    margin: 1rem 0;
+  }
+  input[type=range] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: linear-gradient(to right, var(--color2), var(--color3));
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: var(--color4);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  }
+</style>
 </head>
 <body>
-  <h1>Varun’s Waveform Media Player</h1>
-  <div id="now-playing">Loading...</div>
 
-  <audio id="media-player" crossorigin="anonymous"></audio>
-  <canvas id="visualizer"></canvas>
+<h1>Varun’s Crossfade Audio Player</h1>
 
-  <input type="range" id="seek-slider" min="0" max="100" value="0">
+<div id="player-container">
+  <!-- Two audio elements for crossfade -->
+  <audio id="audio1" preload="auto" crossorigin="anonymous"></audio>
+  <audio id="audio2" preload="auto" crossorigin="anonymous"></audio>
 
   <div id="controls">
-    <button id="skip-prev">⏮️</button>
-    <button id="play-pause">▶️</button>
-    <button id="skip-next">⏭️</button>
-    <button id="shuffle-loop">Mode: Off</button>
+    <button id="prev" title="Previous">⏮️</button>
+    <button id="play-pause" title="Play/Pause">▶️</button>
+    <button id="next" title="Next">⏭️</button>
+    <button id="loop-btn" title="Loop Mode">🔁</button>
+    <button id="shuffle-btn" title="Shuffle">🔀</button>
   </div>
 
-  <div id="media-list"></div>
+  <input type="range" id="seekbar" value="0" min="0" max="100" step="0.1" />
 
-  <script>
-    const username = "varun1210163", repo = "music";
-    const player = document.getElementById("media-player"),
-          playPauseBtn = document.getElementById("play-pause"),
-          nowPlaying = document.getElementById("now-playing"),
-          mediaList = document.getElementById("media-list"),
-          canvas = document.getElementById("visualizer"),
-          skipNextBtn = document.getElementById("skip-next"),
-          skipPrevBtn = document.getElementById("skip-prev"),
-          loopBtn = document.getElementById("shuffle-loop"),
-          seekSlider = document.getElementById("seek-slider"),
-          ctx = canvas.getContext("2d");
+  <div id="playlist">Loading media...</div>
+</div>
 
-    let files = [], index = 0, mode = 0;
-    const modeNames = ["Off","Loop One","Loop All","Shuffle"];
-    loopBtn.onclick = () => {
-      mode = (mode + 1) % 4;
-      loopBtn.textContent = `Mode: ${modeNames[mode]}`;
-    };
+<script>
+(() => {
+  const username = "varun1210163";
+  const repo = "music";
 
-    function updateNow(name) {
-      nowPlaying.textContent = `Now playing: ${name}`;
-      [...mediaList.children].forEach((item,i)=>item.classList.toggle("active",i===index));
+  const audio1 = document.getElementById("audio1");
+  const audio2 = document.getElementById("audio2");
+  const playPauseBtn = document.getElementById("play-pause");
+  const prevBtn = document.getElementById("prev");
+  const nextBtn = document.getElementById("next");
+  const loopBtn = document.getElementById("loop-btn");
+  const shuffleBtn = document.getElementById("shuffle-btn");
+  const seekbar = document.getElementById("seekbar");
+  const playlistDiv = document.getElementById("playlist");
+
+  let audioNodes = [audio1, audio2];
+  let currentAudio = 0; // index of active audio element
+  let isPlaying = false;
+
+  // Loop modes: 0=loop off,1=loop all,2=loop one,3=shuffle
+  let loopMode = 0;
+  let shuffle = false;
+
+  let tracks = [];
+  let currentIndex = 0;
+
+  // Fade config
+  const fadeTime = 2; // seconds
+  const fadeInterval = 50; // ms
+
+  // Crossfade function: fade out old, fade in new
+  function crossfadeToTrack(index) {
+    if (index < 0 || index >= tracks.length) return;
+
+    let nextAudio = 1 - currentAudio;
+    let oldAudio = currentAudio;
+
+    const nextTrack = tracks[index];
+    let volumeStep = 1 / (fadeTime * 1000 / fadeInterval);
+    let fadeOutVol = 1;
+    let fadeInVol = 0;
+
+    // Prepare next audio element
+    audioNodes[nextAudio].src = nextTrack.download_url;
+    audioNodes[nextAudio].currentTime = 0;
+    audioNodes[nextAudio].volume = 0;
+    audioNodes[nextAudio].play();
+
+    // Start fading
+    const fadeTimer = setInterval(() => {
+      fadeOutVol -= volumeStep;
+      fadeInVol += volumeStep;
+      if (fadeOutVol <= 0) {
+        fadeOutVol = 0;
+        fadeInVol = 1;
+        clearInterval(fadeTimer);
+        audioNodes[oldAudio].pause();
+        audioNodes[oldAudio].src = "";
+      }
+      audioNodes[oldAudio].volume = fadeOutVol;
+      audioNodes[nextAudio].volume = fadeInVol;
+    }, fadeInterval);
+
+    currentAudio = nextAudio;
+    currentIndex = index;
+    highlightActiveTrack();
+
+    isPlaying = true;
+    playPauseBtn.textContent = "⏯️";
+  }
+
+  // Highlight the current track in the playlist
+  function highlightActiveTrack() {
+    const items = playlistDiv.querySelectorAll("div");
+    items.forEach((item, i) => {
+      if(i === currentIndex) item.classList.add("active");
+      else item.classList.remove("active");
+    });
+  }
+
+  // Play/pause toggle
+  function togglePlayPause() {
+    if (isPlaying) {
+      audioNodes[currentAudio].pause();
+      playPauseBtn.textContent = "▶️";
+      isPlaying = false;
+    } else {
+      audioNodes[currentAudio].play();
+      playPauseBtn.textContent = "⏯️";
+      isPlaying = true;
     }
-    function playFile(file) {
-      player.src = file.download_url;
-      player.play();
-      updateNow(file.name);
-    }
-    function playIndex(i) {
-      index = i; playFile(files[index]);
-    }
-    function nextTrack() {
-      if(mode===3){
-        let r; do{ r=Math.floor(Math.random()*files.length);}while(r===index&&files.length>1);
-        index=r;
-      } else if(mode===1){
-        // loop one → keep same index
+  }
+
+  // Next track logic with loop/shuffle
+  function nextTrack() {
+    if (shuffle) {
+      let nextIdx;
+      do {
+        nextIdx = Math.floor(Math.random() * tracks.length);
+      } while (nextIdx === currentIndex && tracks.length > 1);
+      crossfadeToTrack(nextIdx);
+    } else {
+      if (loopMode === 2) { // Loop one
+        crossfadeToTrack(currentIndex);
       } else {
-        index = (index + 1) % files.length;
-        if(mode===0 && index===0) return; 
+        let nextIdx = currentIndex + 1;
+        if (nextIdx >= tracks.length) {
+          if (loopMode === 1) nextIdx = 0; // Loop all
+          else return pauseAndReset();
+        }
+        crossfadeToTrack(nextIdx);
       }
-      playIndex(index);
     }
-    function prevTrack(){
-      index = (index-1+files.length)%files.length;
-      playIndex(index);
+  }
+
+  // Previous track
+  function prevTrack() {
+    let prevIdx = currentIndex - 1;
+    if (prevIdx < 0) prevIdx = tracks.length - 1;
+    crossfadeToTrack(prevIdx);
+  }
+
+  // Pause and reset UI
+  function pauseAndReset() {
+    audioNodes[currentAudio].pause();
+    playPauseBtn.textContent = "▶️";
+    isPlaying = false;
+  }
+
+  // Update seekbar while playing
+  function updateSeekbar() {
+    const audio = audioNodes[currentAudio];
+    if (!audio.duration) return;
+    seekbar.max = audio.duration;
+    seekbar.value = audio.currentTime;
+  }
+
+  // Seek audio position from slider
+  seekbar.addEventListener("input", () => {
+    audioNodes[currentAudio].currentTime = seekbar.value;
+  });
+
+  // Loop button cycle through modes
+  loopBtn.addEventListener("click", () => {
+    loopMode = (loopMode + 1) % 4; // 0-3
+    shuffle = loopMode === 3;
+    updateLoopButton();
+  });
+
+  function updateLoopButton() {
+    switch(loopMode) {
+      case 0: loopBtn.textContent = "🔁 Off"; break;
+      case 1: loopBtn.textContent = "🔂 All"; break;
+      case 2: loopBtn.textContent = "🔂 One"; break;
+      case 3: loopBtn.textContent = "🔀 Shuffle"; break;
     }
+  }
+  updateLoopButton();
 
-    playPauseBtn.onclick = () => {
-      if(player.paused) player.play(); else player.pause();
-    };
-    skipNextBtn.onclick = nextTrack;
-    skipPrevBtn.onclick = prevTrack;
+  // Shuffle button toggles shuffle mode
+  shuffleBtn.addEventListener("click", () => {
+    shuffle = !shuffle;
+    loopMode = shuffle ? 3 : 0;
+    updateLoopButton();
+  });
 
-    player.onplay = ()=> playPauseBtn.textContent="⏸️";
-    player.onpause = ()=> playPauseBtn.textContent="▶️";
+  // Play/pause button
+  playPauseBtn.addEventListener("click", togglePlayPause);
+  prevBtn.addEventListener("click", prevTrack);
+  nextBtn.addEventListener("click", nextTrack);
 
-    // Seek slider events
-    player.ontimeupdate = ()=>{
-      if(!player.duration) return;
-      const pct = (player.currentTime/player.duration)*100;
-      seekSlider.value = pct;
-    };
-    seekSlider.oninput = ()=>{
-      if(!player.duration) return;
-      player.currentTime = (seekSlider.value/100)*player.duration;
-    };
+  // Automatically go to next track when current ends (no crossfade here)
+  audio1.addEventListener("ended", () => {
+    if (currentAudio === 0) nextTrack();
+  });
+  audio2.addEventListener("ended", () => {
+    if (currentAudio === 1) nextTrack();
+  });
 
-    // Fetch playlist
-    async function fetchFiles(){
-      const res = await fetch(`https://api.github.com/repos/${username}/${repo}/contents/`);
+  // Load playlist from GitHub API
+  async function loadPlaylist() {
+    playlistDiv.textContent = "Loading media...";
+    try {
+      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/`;
+      const res = await fetch(apiUrl);
       const data = await res.json();
-      files = data.filter(f=>f.name.match(/\.(mp3|mp4)$/i));
-      mediaList.innerHTML = "";
-      files.forEach((f,i)=>{
-        const d = document.createElement("div");
-        d.className="media-item";
-        d.textContent=f.name;
-        d.onclick=()=>playIndex(i);
-        mediaList.appendChild(d);
-      });
-      if(files.length) playIndex(0);
-    }
+      tracks = data.filter(f => /\.(mp3|mp4)$/i.test(f.name));
 
-    // Waveform Visualizer
-    const audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const analyser=audioCtx.createAnalyser();
-    const src=audioCtx.createMediaElementSource(player);
-    src.connect(analyser); analyser.connect(audioCtx.destination);
-    analyser.fftSize=128;
-    const bufLen=analyser.frequencyBinCount;
-    const dataArr=new Uint8Array(bufLen);
-    function draw(){
-      requestAnimationFrame(draw);
-      analyser.getByteFrequencyData(dataArr);
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      const barWidth=canvas.width/bufLen;
-      for(let i=0;i<bufLen;i++){
-        const h=dataArr[i]/255*canvas.height;
-        ctx.fillStyle=`hsl(${i/bufLen*360},100%,60%)`;
-        ctx.fillRect(i*barWidth,canvas.height-h,barWidth,h);
+      if (tracks.length === 0) {
+        playlistDiv.textContent = "No audio files found.";
+        return;
       }
-    }
-    player.onplay = ()=>{
-      audioCtx.resume();
-      draw();
-      playPauseBtn.textContent="⏸️";
-    };
-    player.onpause = ()=> playPauseBtn.textContent="▶️";
 
-    fetchFiles();
-  </script>
+      playlistDiv.innerHTML = "";
+      tracks.forEach((track, i) => {
+        const div = document.createElement("div");
+        div.textContent = track.name;
+        div.addEventListener("click", () => {
+          if (i !== currentIndex) crossfadeToTrack(i);
+        });
+        playlistDiv.appendChild(div);
+      });
+
+      // Start with first track
+      crossfadeToTrack(0);
+    } catch(e) {
+      playlistDiv.textContent = "Failed to load playlist.";
+      console.error(e);
+    }
+  }
+
+  // Update seekbar on timeupdate
+  function setupSeekbarUpdater() {
+    audioNodes.forEach(audio => {
+      audio.addEventListener("timeupdate", updateSeekbar);
+    });
+  }
+  setupSeekbarUpdater();
+
+  loadPlaylist();
+
+  // Background color changer (slowly cycles colors)
+  const colors = [
+    '#ff6f61', '#f7d794', '#778beb', '#e77f67', '#f8a5c2'
+  ];
+  let colorIndex = 0;
+  setInterval(() => {
+    colorIndex = (colorIndex + 1) % colors.length;
+    document.body.style.background = `linear-gradient(135deg, ${colors[colorIndex]}, ${colors[(colorIndex+1)%colors.length]})`;
+  }, 10000);
+
+})();
+</script>
+
 </body>
 </html>
